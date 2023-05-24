@@ -9,10 +9,34 @@
             <div class="clear"></div>
             <div class="camera">
                 <img src="{{ url_for('video_feed_camera') }}">
+
             </div>
+
         </div>
+
+        <!-- <script>
+            var resultElement = $('#result');
+        </script> -->
+
         <div class="col p-4 bg-dark text-white ketqua">
             <h2>Kết Quả Dự Đoán</h2>
+            <p id="result"></p>
+            <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+            <script>
+                function updateResult() {
+                    $.ajax({
+                        url: "/result",
+                        type: "GET",
+                        cache: false,
+                        success: function(response) {
+                            // resultElement.text(response);
+                            $('#result').text(response);
+                        }
+                    });
+                }
+                setInterval(updateResult, 10);
+            </script>
         </div>
         <div class="clear"></div>
         

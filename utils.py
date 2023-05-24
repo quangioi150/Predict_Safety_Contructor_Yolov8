@@ -12,20 +12,7 @@ from ultralytics.yolo.utils.plotting import Annotator, colors
 
 # Initialize the models
 model_sample_model = YOLO("./models/best.pt")
-
-def gen_frames():
-    while True:
-        success, frame = camera.read()
-        if not success:
-            break
-        else:
-            ret, buffer = cv2.imencode('.jpg', frame)
-            frame = buffer.tobytes()
-            yield (b'--frame\r\n'
-                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
             
-            
-
 
 def transform_predict_to_df(results: list, labeles_dict: dict) -> pd.DataFrame:
     """
@@ -46,6 +33,7 @@ def transform_predict_to_df(results: list, labeles_dict: dict) -> pd.DataFrame:
     predict_bbox['class'] = (results[0].to("cpu").numpy().boxes.cls).astype(int)
     # Replace the class number with the class name from the labeles_dict
     predict_bbox['name'] = predict_bbox["class"].replace(labeles_dict)
+    
     return predict_bbox
 
 def get_model_predict(model: YOLO, input_image: Image, save: bool = False, image_size: int = 1248, conf: float = 0.5, augment: bool = False) -> pd.DataFrame:
@@ -150,6 +138,7 @@ def crop_image_by_predict(image: Image, predict: pd.DataFrame(), crop_class_name
     crop_predicts = predict[(predict['name'] == crop_class_name)]
 
     if crop_predicts.empty:
+        
         raise HTTPException(status_code=400, detail=f"{crop_class_name} not found in photo")
 
     # if there are several detections, choose the one with more confidence
@@ -161,17 +150,6 @@ def crop_image_by_predict(image: Image, predict: pd.DataFrame(), crop_class_name
     img_crop = image.crop(crop_bbox)
     return(img_crop)
 
-# def get_prediction(input_image):
-     
-#     predict = detect_sample_model(input_image)
-#     # add bbox on image
-#     final_image = add_bboxs_on_img(image = input_image, predict = predict)
-    
-#     image = cv2.cvtColor(np.array(final_image), cv2.COLOR_RGB2BGR)
-    
-#     image = cv2.resize(image[:,:,::-1], (640, 480))
-    
-#     return image
 
 def object_json(filename):
     """

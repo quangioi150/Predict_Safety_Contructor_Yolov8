@@ -1,0 +1,3 @@
+- model=best.pt
+- source=test.mp4
+- show=True
