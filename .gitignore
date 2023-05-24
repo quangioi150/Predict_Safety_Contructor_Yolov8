@@ -1,0 +1,13 @@
+#git
+.idea
+
+# dotenv
+.env
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+
+# virtualenv
+.venv/
+venv/
+ENV/
