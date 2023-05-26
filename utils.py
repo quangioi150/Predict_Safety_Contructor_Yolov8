@@ -1,8 +1,11 @@
 from PIL import Image
 import io
+import os 
 import pandas as pd
 import numpy as np
 import cv2
+import datetime
+from threading import Thread
 
 from typing import Optional
 import json 
@@ -12,7 +15,9 @@ from ultralytics.yolo.utils.plotting import Annotator, colors
 
 # Initialize the models
 model_sample_model = YOLO("./models/best.pt")
-            
+
+
+
 
 def transform_predict_to_df(results: list, labeles_dict: dict) -> pd.DataFrame:
     """
@@ -68,8 +73,6 @@ def get_model_predict(model: YOLO, input_image: Image, save: bool = False, image
     return predictions
 
 
-################################# BBOX Func #####################################
-
 def add_bboxs_on_img(image: Image, predict: pd.DataFrame()) -> Image:
     """
     add a bounding box on the image
@@ -97,9 +100,6 @@ def add_bboxs_on_img(image: Image, predict: pd.DataFrame()) -> Image:
         annotator.box_label(bbox, text, color=colors(row['class'], True))
     # convert the annotated image to PIL image
     return Image.fromarray(annotator.result())
-
-
-################################# Models #####################################
 
 
 def detect_sample_model(input_image: Image) -> pd.DataFrame:
@@ -139,7 +139,7 @@ def crop_image_by_predict(image: Image, predict: pd.DataFrame(), crop_class_name
 
     if crop_predicts.empty:
         
-        raise HTTPException(status_code=400, detail=f"{crop_class_name} not found in photo")
+        return None
 
     # if there are several detections, choose the one with more confidence
     if len(crop_predicts) > 1:
@@ -149,6 +149,46 @@ def crop_image_by_predict(image: Image, predict: pd.DataFrame(), crop_class_name
     # crop
     img_crop = image.crop(crop_bbox)
     return(img_crop)
+
+
+def save_object(input_image):
+    """
+    Object Detection from an image.
+
+    Args:
+        input_image (bytes): The image file in bytes format.
+    Returns:
+        image: image or None
+    """
+    color_coverted = cv2.cvtColor(input_image, cv2.COLOR_BGR2RGB)
+    
+    input_image = Image.fromarray(color_coverted)
+    predict = detect_sample_model(input_image)
+    print('aaaa',predict)
+    
+    path = './static/object/'
+    today = datetime.date.today().strftime("%Y-%m-%d")
+    folder_path = os.path.join(path, today)
+    
+    os.makedirs(folder_path, exist_ok=True)
+    
+    # Get the count of existing folders
+    existing_folders = sum(
+        1 for entry in os.scandir(folder_path)
+        if entry.is_dir() and entry.name.startswith("run")
+    )
+
+    # Generate a new folder name
+    folder_name = f"run{existing_folders + 1}"
+    folder_path = os.path.join(folder_path, folder_name)
+
+    # Create a new folder
+    os.mkdir(folder_path)
+                
+    classes = predict['name']
+    for cls in classes:
+        object = crop_image_by_predict(input_image, predict, crop_class_name = cls)
+        object.save("{}/{}.jpg".format(folder_path,cls))
 
 
 def object_json(filename):
@@ -175,3 +215,27 @@ def object_json(filename):
     result['detect_objects'] = json.loads(detect_res.to_json(orient='records'))
 
     return result
+
+def get_prediction(input_image):
+    
+    predict = detect_sample_model(input_image)
+    
+    result = object_json(input_image)
+    dangerous = []
+    
+    objects_detect = result["detect_objects_names"].replace(" ", "").split(',')
+    if 'NO-SafetyVest' in objects_detect:
+        dangerous.append('NO-Safety Vest')
+    if 'NO-Hardhat' in objects_detect:
+        dangerous.append('NO-Hardhat')
+    if "NO-Mask" in objects_detect:
+        dangerous.append("NO-Mask")
+    # add bbox on image
+    final_image = add_bboxs_on_img(image = input_image, predict = predict)
+    
+    image = cv2.cvtColor(np.array(final_image), cv2.COLOR_RGB2BGR)
+    
+    image = cv2.resize(image[:,:,::-1], (640, 480))
+    
+    return image, dangerous
+
