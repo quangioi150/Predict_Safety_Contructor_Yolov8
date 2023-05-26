@@ -1,0 +1,177 @@
+<section class="vh-100">
+    <div class="container py-5 h-100">
+      <div class="row d-flex align-items-top justify-content-center h-100">
+        
+        <div style="border-top:3px solid #4285f4 !important" class=" bg-white border border-top  p-3 col-md-4 col-sm-12">
+          <div class="text-center">
+            <img class="border border-dark rounded" src="/assets/logo.jpg" style="width:90px" alt="">
+          </div>
+          <h5 class="mt-3 text-center mb-3">PHẦN MỀM PHÁT HIỆN BẤT THƯỜNG VỀ TRANG PHỤC BẢO HỘ</h5>
+          <p-tabView>
+            <p-tabPanel header="Đăng nhập vào hệ thống">
+              <form [formGroup]="formLogin"  > 
+                <div class="form-group">
+                  <h6 class="d-block">Tên đăng nhập(*)</h6>
+                  <span class="p-input-icon-left w-100">
+                    <i class="pi pi-user"></i>
+                    <input class="w-100" type="text" pInputText placeholder="Nhập tên đăng nhập" formControlName="username" />
+                  </span>
+                  <div
+                    class="mt-1"
+                    *ngIf="formLogin.controls['username'].touched && formLogin.controls['username'].getError('required')">
+                    <h6 class="text-danger">Tên đăng nhập là trường bắt buộc</h6>
+                  </div>
+                </div>
+                <div class="mt-3 form-group">
+                  <h6 class="d-block">Mật khẩu(*)</h6>
+                  <span class="p-input-icon-left w-100">
+                    <i class="pi pi-key"></i>
+                    <input class="w-100" type="{{ passwordTextTypeLogin ? 'text' : 'password' }}" pInputText placeholder="Nhập mật khẩu" formControlName="password" />
+                  </span>
+                  <div
+                    class="mt-1"
+                    *ngIf="formLogin.controls['password'].touched && formLogin.controls['password'].getError('required')">
+                    <h6 class="text-danger">Mật khẩu là trường bắt buộc</h6>
+                  </div>
+                </div>
+                <div class="mt-2 field-checkbox d-flex form-group">
+                  <p-checkbox [binary]="true" inputId="binary" (onChange)="togglePasswordTextTypeLogin($event)"></p-checkbox>
+                  <h6 class="mb-0 ml-2" for="binary">Hiện mật khẩu</h6>
+                </div>
+                <div class="text-center d-flex justify-content-center w-100 mt-3">
+                  
+                </div>
+                <p-divider></p-divider>
+                <div class="pt-1 pb-1">
+                  <h6 class="text-center font-weight-bold ">Bạn quên mật khẩu? <a href="" class="text-decoration-none text-danger">Quên mật khẩu</a></h6>
+                  <h6 class="text-center font-weight-bold ">Hướng dẫn quên mật khẩu <a href="" class=" text-decoration-none text-danger">Xem hướng dẫn</a></h6>
+                </div>
+                <div class="mt-3 d-flex justify-content-center">
+                  <button
+                    pButton
+                    pRipple
+                    type="button"
+                    label="Đăng nhập"
+                    class="p-button-raised w-100"
+                    (click)="login(userId)"
+                    [disabled]="formLogin.invalid"
+                    [loading]="isLogin"></button>
+                </div>
+              </form>
+            </p-tabPanel>
+            <p-tabPanel header="Đăng ký tài khoản" >
+              <form [formGroup]="formRegister"  >
+                <div class=" form-group">
+                    <h6 class="d-block">Họ và tên(*)</h6>
+                    <span class="p-input-icon-left w-100">
+                      <i class="pi pi-tag"></i>
+                      <input class="w-100" type="text" pInputText placeholder="Nhập họ và tên" formControlName="name" />
+                    </span>
+                    <div
+                      class="mt-1"
+                      *ngIf="formRegister.controls['name'].touched && formRegister.controls['name'].getError('required')">
+                      <h6 class="text-danger">Họ tên là trường bắt buộc</h6>
+                    </div>
+                </div>
+                <div class="mt-3 form-group">
+                  <h6 class="d-block">Tên đăng nhập(*)</h6>
+                  <span class="p-input-icon-left w-100">
+                    <i class="pi pi-user"></i>
+                    <input class="w-100" type="text" pInputText placeholder="Nhập tên đăng nhập" formControlName="username" />
+                  </span>
+                  <div
+                    class="mt-1"
+                    *ngIf="formRegister.controls['username'].touched && formRegister.controls['username'].getError('required')">
+                    <h6 class="text-danger">Tên đăng nhập là trường bắt buộc</h6>
+                  </div>
+                </div>
+                <div class="mt-3 form-group">
+                  <h6 class="d-block">Ngày sinh(*)</h6>
+                  <span class="p-input-icon-left w-100">
+                    <i class="pi pi-calendar"></i>
+                    <input class="w-100" type="text" pInputText placeholder="Nhập ngày sinh" formControlName="dob" />
+                  </span>
+                  <div
+                    class="mt-1"
+                    *ngIf="formRegister.controls['dob'].touched && formRegister.controls['dob'].getError('required')">
+                    <h6 class="text-danger">Ngày sinh là trường bắt buộc</h6>
+                  </div>
+                </div>
+                <div class="mt-3 form-group">
+                    <h6 class="d-block">Địa chỉ(*)</h6>
+                    <span class="p-input-icon-left w-100">
+                      <i class="pi pi-home"></i>
+                      <input class="w-100" type="text" pInputText placeholder="Nhập địa chỉ" formControlName="address" />
+                    </span>
+                      <div
+                      class="mt-1"
+                      *ngIf="formRegister.controls['address'].touched && formRegister.controls['address'].getError('required')">
+                      <h6 class="text-danger">Địa chỉ là trường bắt buộc</h6>
+                    </div>
+                  </div>
+                <div class="mt-3 form-group">
+                  <h6 class="d-block">Mật khẩu(*)</h6>
+                  <span class="p-input-icon-left w-100">
+                    <i class="pi pi-key"></i>
+                    <input class="w-100" type="{{ passwordTextTypeRegister ? 'text' : 'password' }}" pInputText placeholder="Nhập mật khẩu" formControlName="password" />
+                  </span>
+                  <div
+                    class="mt-1"
+                    *ngIf="formRegister.controls['password'].touched && formRegister.controls['password'].getError('required')">
+                    <h6 class="text-danger">Mật khẩu là trường bắt buộc</h6>
+                  </div>
+                </div>
+                <div class="mt-2 field-checkbox d-flex form-group">
+                  <p-checkbox [binary]="true"  inputId="binary" (onChange)="togglePasswordTextTypeRegister($event)"></p-checkbox>
+                  <h6 class="mb-0 ml-2" for="binary">Hiện mật khẩu</h6>
+                </div>
+                <div class="text-center d-flex justify-content-center w-100 mt-3">
+                  
+                </div>
+                <p-divider></p-divider>
+                <div class="pt-1 pb-1">
+                </div>
+                <div class="mt-3 d-flex justify-content-center">
+                  <button
+                    pButton
+                    pRipple
+                    type="button"
+                    label="Đăng ký"
+                    class="p-button-raised w-100"
+                    (click)="register()"
+                    [disabled]="formRegister.invalid"
+                    ></button>
+                </div>
+              </form>
+            </p-tabPanel>
+          </p-tabView>
+          
+        </div>
+      </div>
+    </div>
+    <p-toast></p-toast>
+    <p-toast position="top-left" key="tl"></p-toast>
+    <p-toast position="top-center" key="tc"></p-toast>
+    <p-toast position="bottom-center" key="bc"></p-toast>
+    
+    <p-toast position="bottom-center" key="c"  [baseZIndex]="5000">
+        <ng-template let-message pTemplate="message">
+            <div class="flex flex-column" style="flex: 1">
+                <div class="text-center">
+                    <i class="pi pi-exclamation-triangle" style="font-size: 2.6rem"></i>
+                    <h4>{{message.summary}}</h4>
+                    <p>{{message.detail}}</p>
+                </div>
+                <div class="grid p-fluid">
+                    <div class="col-6">
+                        <button type="button" pButton  label="Yes" class="p-button-success"></button>
+                    </div>
+                    <div class="col-6">
+                        <button type="button" pButton  label="No" class="p-button-secondary"></button>
+                    </div>
+                </div>
+            </div>
+        </ng-template>
+    </p-toast>
+  </section>
+  

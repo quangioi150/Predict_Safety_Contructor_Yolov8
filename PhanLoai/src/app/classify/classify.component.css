@@ -1,0 +1,41 @@
+.container1 {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.navbar {
+    z-index: 999;
+    position: sticky;
+    top: 0;
+    left: 0;
+}
+
+.btnUpload {
+    margin-top: 10px;
+    width: fit-content;
+    margin-right: 40px;
+}
+
+.btn {
+    display: flex;
+    justify-content: space-between;
+}
+
+.tall {
+    height: 300px;
+    overflow: auto;
+}
+
+.regular  {
+    display: block;
+}
+
+.none {
+    display: none ;
+}
+
+.unset {
+    display: block;
+}

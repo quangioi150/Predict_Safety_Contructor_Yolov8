@@ -1,0 +1,216 @@
+<!-- <nav class="navbar border-bottom  bg-primary   ">
+    <div class="container-fluid">
+        <div class="navbar-header d-flex align-items-center">
+            <a href="/" class="navbar-brand">
+                <img class="border border-dark rounded" src="/assets/logo.jpg" style="width:45px" alt="">
+            </a>
+            <div class="page-title">
+                <h5 class="m-0 text-white ">PHÁT HIỆN BẤT THƯỜNG VỀ TRANG PHỤC BẢO HỘ LAO ĐỘNG</h5>
+            </div>
+        </div>
+        <div class="be-right-navbar d-flex align-items-center">
+            <strong class="text-white mr-3">Xin chào, {{userInfor.HoTen}}</strong>
+            <div style="margin-left: 10px;">
+                <button
+                    pButton
+                    class=" w-100 p-button-danger text-center p-button-sm  p-2 font-weight-bold"
+                    label="Log out "
+                    icon="pi pi-sign-out"
+                    (click)="logout()"
+                    iconPos="right"
+                ></button>
+            </div>
+        </div>
+    </div>
+</nav>
+<div class="container">
+
+    <div class="row">
+        <div class="col-lg-7">
+            <div class="container1">
+                <video #videoElement class="regular"  style=" width: 100% ; border:2px solid #000" >
+                </video>
+                <video  #videoElement></video>
+                <form class="d-flex align-items" style="flex-direction: column;" [formGroup]="uploadForm" >
+                    <div class="imagePreview" *ngIf="imageURL && imageURL !== ''">
+                        <img  [src]="imageURL" [alt]="uploadForm.value.name" [border]="2" height="500px" width="500px">
+                        
+                    </div>
+                    <div class="imagePreview" *ngIf="videoUrl && videoUrl !== ''">
+                        <video *ngIf="videoUrl" controls muted height="500px" width="500px">
+                            <source [src]="videoUrl" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </div>
+                    <div class="d-flex gap-3 mt-3">
+                        <input  pInputText  type="file" (change)="showPreview($event)" /> 
+                        <button (click)="startCamera()" class="start" pButton icon="pi pi-camera" type="submit" label="Camera"></button>
+                        <button (click)="stopCamera()"  class="stop p-button-danger" pButton  icon="pi pi-camera" type="submit" label="Stop"></button>
+                    </div>
+                    <div class="mt-3 w-100 d-flex justify-content-between">
+                        <button (click)="classify()" pButton class="w-100 text-center"  type="submit" label="Phân loại"></button>
+
+                    </div>
+                </form>
+                <video *ngIf="videoUrl" controls muted  height="500px" width="500px">
+                    <source [src]="videoUrl" type="video/mp4">
+                    Your browser does not support the video tag.
+                  </video>
+                <input  pInputText type="file" (change)="showPreview($event)" />
+            </div>
+        </div>
+        <div class="col-lg-5" >
+            
+
+        <div style="margin-bottom:10px; margin-top:20px ">
+            <p-inplace [closable]="true"  >
+                <ng-template pTemplate="display">
+                    
+                        <button pButton icon="pi pi-user" label="Xem thông tin cá nhân"></button>
+                    
+                </ng-template>
+                <ng-template pTemplate="content">
+                    <table border="2" class="table table-bordered caption-top">
+                        <tbody>
+                            <tr class="bg-primary text-white">
+                                <th></th>
+                                <th>Thông tin</th>
+                            </tr>
+                            <tr>
+                                <th >Họ tên</th>
+                                <td>{{userInfor.HoTen}}</td>
+                            </tr>
+                            <tr>
+                                <th >Tên đăng nhập</th>
+                                <td>{{userInfor.TenDN}}</td>
+                            </tr>
+                            <tr>
+                                <th>Ngày sinh</th>
+                                <td>{{userInfor.NgaySinh}}</td>
+                            </tr>
+                            <tr>
+                                <th>Địa chỉ</th>
+                                <td>{{userInfor.DiaChi}}</td>
+                            </tr>
+                        </tbody>                
+                    </table>
+                    <div class="mr-3" style="display: inline-block; margin-right: 10px">
+
+                        <button (click)="userEdit(userInfor.UserID)" pButton icon="pi pi-pencil" label="Sửa thông tin cá nhân"></button>
+                    </div>
+                </ng-template>
+            </p-inplace>
+        </div>
+           
+            <p-table
+                    [value]="userList"
+                    [paginator]="true"
+                    [rows]="3"
+                    [rowsPerPageOptions]="[3,5]"
+                    [globalFilterFields]="['TenBenh']"
+                    styleClass="p-datatable-sm p-datatable-striped p-datatable-gridlines"
+                    responsiveLayout="scroll">
+                    <ng-template pTemplate="header">
+                      <tr>
+                        <th class="text-center">ID</th>
+                        <th class="text-center" id="STT">Ngày</th>
+                        <th class="text-center" id="Ten">Ảnh</th>
+                        <th class="text-center" id="Ten">Loại bệnh
+                            <p-columnFilter
+                                type="text"
+                                field="TenBenh"
+                                display="menu"
+                            ></p-columnFilter>        
+                        </th>
+                        <th class="text-center" id="ThaoTac">Độ chính xác</th>
+                        <th class="text-center" id="ThaoTac">Hành động</th>
+                      </tr>
+                      
+                    </ng-template>
+                    <ng-template pTemplate="body" let-item let-rowIndex="rowIndex" >
+                      <tr>
+                        <td>
+                            {{ item.ResultID }}
+                        </td>
+                        <td class="text-center" >
+                            {{ item.NgayTest  }}
+                        </td>
+                        <td class="text-truncate" >
+                            {{ item.LinkImg }}
+                        </td>
+                        <td class="text-center"  >
+                            {{ item.TenBenh }}
+                        </td>
+                        <td class="text-center"  >
+                            {{ item.DoChinhXac * 100 | number }}%
+                        </td>
+                        
+                        <td style="width: 8rem">
+                          <div class="d-flex justify-content-center">
+                            <button
+                              pButton
+                              type="button"
+                              icon="pi pi-trash"
+                              pTooltip="Xóa"
+                              tooltipPosition="bottom"
+                              (click)="deleteResult1(item.ResultID)"
+                              class="p-button-text p-button-danger p-button-sm"></button>
+                          </div>
+                        </td>
+                      </tr>
+                    </ng-template>
+                    <ng-template  pTemplate="emptymessage" let-columns>
+                        <tr>
+                          <td colspan="12" class="text-center">
+                            <img style="width: 180px;" src="/assets/nodata.PNG" alt="">
+                          </td>
+                        </tr>
+                      </ng-template>
+                    <ng-template pTemplate="summary">
+                      <div class="p-d-flex p-ai-center p-jc-between">Tổng: {{userList.length}} kết quả.</div>
+                    </ng-template>
+                  </p-table>
+
+        </div>
+    </div>
+</div>
+<p-toast></p-toast>
+<p-toast position="top-left" key="tl"></p-toast>
+<p-toast position="top-center" key="tc"></p-toast>
+<p-toast position="bottom-center" key="bc"></p-toast>
+
+<p-toast position="bottom-center" key="c"  [baseZIndex]="5000">
+    <ng-template let-message pTemplate="message">
+        <div class="flex flex-column" style="flex: 1">
+            <div class="text-center">
+                <i class="pi pi-exclamation-triangle" style="font-size: 2.6rem"></i>
+                <h4>{{message.summary}}</h4>
+                <p>{{message.detail}}</p>
+            </div>
+            <div class="grid p-fluid">
+                <div class="col-6">
+                    <button type="button" pButton  label="Yes" class="p-button-success"></button>
+                </div>
+                <div class="col-6">
+                    <button type="button" pButton  label="No" class="p-button-secondary"></button>
+                </div>
+            </div>
+        </div>
+    </ng-template>
+</p-toast>
+ -->
+ <h1>Upload Image</h1>
+
+ <div>
+   <input type="file" (change)="onFileSelected($event)" accept="image/*" />
+   <button (click)="onUpload()">Upload</button>
+ </div>
+ 
+ <div *ngIf="errorMessage" class="error-message">
+   {{ errorMessage }}
+ </div>
+ 
+ <div *ngIf="imageUrl" class="image-preview">
+   <img [src]="imageUrl" alt="Preview" />
+ </div>
+
