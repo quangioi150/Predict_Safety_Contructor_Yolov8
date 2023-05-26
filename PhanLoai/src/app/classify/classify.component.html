@@ -1,4 +1,4 @@
-<!-- <nav class="navbar border-bottom  bg-primary   ">
+<nav class="navbar border-bottom  bg-primary   ">
     <div class="container-fluid">
         <div class="navbar-header d-flex align-items-center">
             <a href="/" class="navbar-brand">
@@ -9,7 +9,7 @@
             </div>
         </div>
         <div class="be-right-navbar d-flex align-items-center">
-            <strong class="text-white mr-3">Xin chào, {{userInfor.HoTen}}</strong>
+            <!-- <strong class="text-white mr-3">Xin chào, {{userInfor.HoTen}}</strong> -->
             <div style="margin-left: 10px;">
                 <button
                     pButton
@@ -30,18 +30,18 @@
             <div class="container1">
                 <video #videoElement class="regular"  style=" width: 100% ; border:2px solid #000" >
                 </video>
-                <video  #videoElement></video>
+                <!-- <video  #videoElement></video> -->
                 <form class="d-flex align-items" style="flex-direction: column;" [formGroup]="uploadForm" >
                     <div class="imagePreview" *ngIf="imageURL && imageURL !== ''">
                         <img  [src]="imageURL" [alt]="uploadForm.value.name" [border]="2" height="500px" width="500px">
                         
                     </div>
-                    <div class="imagePreview" *ngIf="videoUrl && videoUrl !== ''">
+                    <!-- <div class="imagePreview" *ngIf="videoUrl && videoUrl !== ''">
                         <video *ngIf="videoUrl" controls muted height="500px" width="500px">
                             <source [src]="videoUrl" type="video/mp4">
                             Your browser does not support the video tag.
                         </video>
-                    </div>
+                    </div> -->
                     <div class="d-flex gap-3 mt-3">
                         <input  pInputText  type="file" (change)="showPreview($event)" /> 
                         <button (click)="startCamera()" class="start" pButton icon="pi pi-camera" type="submit" label="Camera"></button>
@@ -52,11 +52,11 @@
 
                     </div>
                 </form>
-                <video *ngIf="videoUrl" controls muted  height="500px" width="500px">
+                <!-- <video *ngIf="videoUrl" controls muted  height="500px" width="500px">
                     <source [src]="videoUrl" type="video/mp4">
                     Your browser does not support the video tag.
-                  </video>
-                <input  pInputText type="file" (change)="showPreview($event)" />
+                  </video> -->
+                <!-- <input  pInputText type="file" (change)="showPreview($event)" /> -->
             </div>
         </div>
         <div class="col-lg-5" >
@@ -78,25 +78,25 @@
                             </tr>
                             <tr>
                                 <th >Họ tên</th>
-                                <td>{{userInfor.HoTen}}</td>
+                                <!-- <td>{{userInfor.HoTen}}</td> -->
                             </tr>
                             <tr>
                                 <th >Tên đăng nhập</th>
-                                <td>{{userInfor.TenDN}}</td>
+                                <!-- <td>{{userInfor.TenDN}}</td> -->
                             </tr>
                             <tr>
                                 <th>Ngày sinh</th>
-                                <td>{{userInfor.NgaySinh}}</td>
+                                <!-- <td>{{userInfor.NgaySinh}}</td> -->
                             </tr>
                             <tr>
                                 <th>Địa chỉ</th>
-                                <td>{{userInfor.DiaChi}}</td>
+                                <!-- <td>{{userInfor.DiaChi}}</td> -->
                             </tr>
                         </tbody>                
                     </table>
                     <div class="mr-3" style="display: inline-block; margin-right: 10px">
 
-                        <button (click)="userEdit(userInfor.UserID)" pButton icon="pi pi-pencil" label="Sửa thông tin cá nhân"></button>
+                        <!-- <button (click)="userEdit(userInfor.UserID)" pButton icon="pi pi-pencil" label="Sửa thông tin cá nhân"></button> -->
                     </div>
                 </ng-template>
             </p-inplace>
@@ -198,8 +198,8 @@
         </div>
     </ng-template>
 </p-toast>
- -->
- <h1>Upload Image</h1>
+
+ <!-- <h1>Upload Image</h1>
 
  <div>
    <input type="file" (change)="onFileSelected($event)" accept="image/*" />
@@ -212,5 +212,5 @@
  
  <div *ngIf="imageUrl" class="image-preview">
    <img [src]="imageUrl" alt="Preview" />
- </div>
+ </div> -->
 

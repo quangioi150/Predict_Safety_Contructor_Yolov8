@@ -38,30 +38,30 @@ export class ClassifyComponent {
   errorMessage: string | null = null;
 
 
-  onFileSelected(event: any) {
-    this.selectedFile = event.target.files[0];
-    this.errorMessage = null;
-    this.imageUrl = null;
-  }
+  // onFileSelected(event: any) {
+  //   this.selectedFile = event.target.files[0];
+  //   this.errorMessage = null;
+  //   this.imageUrl = null;
+  // }
 
-  onUpload() {
-    if (this.selectedFile) {
-      this.backendService.uploadImage(this.selectedFile)
-        .subscribe(
-          (response) => {
-            this.imageUrl = response.imageUrl;
-            console.log(this.imageUrl)
-            this.errorMessage = this.imageUrl;
+  // onUpload() {
+  //   if (this.selectedFile) {
+  //     this.backendService.uploadImage(this.selectedFile)
+  //       .subscribe(
+  //         (response) => {
+  //           this.imageUrl = response.imageUrl;
+  //           console.log(this.imageUrl)
+  //           this.errorMessage = this.imageUrl;
 
-          },
-          (error) => {
-            this.errorMessage = 'Error uploading image.';
-          }
-        );
-    } else {
-      this.errorMessage = 'Please select an image file.';
-    }
-  }
+  //         },
+  //         (error) => {
+  //           this.errorMessage = 'Error uploading image.';
+  //         }
+  //       );
+  //   } else {
+  //     this.errorMessage = 'Please select an image file.';
+  //   }
+  // }
 
 
   
