@@ -77,7 +77,7 @@ def generate_frames_video(filename):
         if not success:
             break
         else:
-            frame = cv2.resize(frame, (640, 480))
+            # frame = cv2.resize(frame, (640, 480))
 
             frame, dangerous = get_prediction(frame)
             save_object(frame)
@@ -146,8 +146,9 @@ async def upload_image():
 
         # add bbox on image
         final_image = add_bboxs_on_img(image = input_image, predict = predict)
-        image = cv2.cvtColor(np.array(final_image), cv2.COLOR_RGB2BGR)
-        image = cv2.resize(image[:,:,::-1], (480, 320))
+        # image = cv2.cvtColor(np.array(final_image), cv2.COLOR_RGB2BGR)
+        image = np.array(final_image)
+        # image = image[:,:,::-1]
         name_image = re.findall(pattern_name, filename)
 
         cv2.imwrite("static/uploads/{}_predict.jpg".format(name_image[0]), image)
@@ -217,7 +218,7 @@ async def result():
     dangerous_text = dangerous_str
     return dangerous_text
 
-@app.route('/camera_stop', methods=["POST"])
+@app.route('/camera_stop', methods=["GET"])
 async def start_or_stop():
     global start_camera
     global cap
@@ -248,14 +249,14 @@ async def upload_video():
     
     file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
     
-    return render_template('predict_video.html', filename=filename)
-    # return {'filename': filename}
+    # return render_template('predict_video.html', filename=filename)
+    return {'filename': filename}
             
             
-@app.route('/video_feed_video')
-async def video_feed_video():
+@app.route('/video_feed_video/<filename>')
+async def video_feed_video(filename):
     
-    filename = session.get('filename')
+    # filename = session.get('filename')
     
     return Response(generate_frames_video(filename), mimetype='multipart/x-mixed-replace; boundary=frame')
 

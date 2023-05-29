@@ -11,7 +11,7 @@ import { ToastMessageService } from '../service/toast-message.service';
 import { UserServiceService } from '../service/user-service.service';
 import { UserUpdateComponent } from '../user-update/user-update.component';
 import { HttpClient } from '@angular/common/http';
-
+import { interval } from 'rxjs';
 @Component({
   selector: 'app-classify',
   templateUrl: './classify.component.html',
@@ -90,6 +90,7 @@ export class ClassifyComponent {
     //   console.error('getUserMedia is not supported');
     // }
     this.link = 'http://127.0.0.1:5000/video_feed_camera'
+    
   }
 
   stopCamera() {
@@ -117,6 +118,7 @@ export class ClassifyComponent {
     });
   }
   
+  
   public userList: Result[] = [];
   public list: User[]=[];
   // selectedFile: File;
@@ -129,8 +131,29 @@ export class ClassifyComponent {
     this.uploadForm = this.fb.group({
       avatar: [null],
     })
+    interval(100).subscribe(() => {
+      this.updateResult();
+    });
   }
-
+  updateResult(): void {
+    this.http.get<string>('http://127.0.0.1:5000/result')
+      .subscribe(response => {
+        if (response === '') {
+          document.getElementById('result').textContent = response;
+          document.getElementById('title').textContent = 'SAFETY';
+          document.getElementById('title').classList.remove('dangerous');
+          document.getElementById('title').classList.add('safety');
+        } else {
+          document.getElementById('result').textContent = response;
+          document.getElementById('title').textContent = 'DANGEROUS';
+          document.getElementById('title').classList.remove('safety');
+          document.getElementById('title').classList.add('dangerous');
+        }
+      });
+  }
+  
+  
+  
    
   showPreview(event) {
     const file: File = event.target.files[0];
@@ -233,6 +256,17 @@ export class ClassifyComponent {
     //   }
     // })
 
+  }
+
+  classify1() {
+    console.log( this.selectedFile)
+
+    let formData = new FormData
+    formData.append("file",this.selectedFile)
+    const url = 'http://127.0.0.1:5000/upload_video';
+    this.http.post(url,formData).subscribe(response => {
+      this.link = `http://127.0.0.1:5000/video_feed_video/${response['filename']}`
+    });
   }
   
 }
