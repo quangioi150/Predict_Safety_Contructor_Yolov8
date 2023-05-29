@@ -12,6 +12,9 @@ from PIL import Image
 import io
 import requests
 from threading import Thread
+from flask import Flask
+from flask_cors import CORS
+from flask_restful import Api, Resource
 
 from utils import detect_sample_model, add_bboxs_on_img, object_json, save_object, get_prediction
 
@@ -22,6 +25,8 @@ model = YOLO("models/best.pt")
 
 #Tạo Flask app
 app = Flask(__name__)
+CORS(app)
+api = Api(app)
 
 UPLOAD_FOLDER = "static/uploads"
 ALLOW_EXTENSIONS = set(['png', 'jpg', 'jpeg'])
@@ -80,7 +85,11 @@ def generate_frames_video(filename):
             yield (b'--frame\r\n'
                    b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
             
-
+class HelloWorld(Resource):
+    def get(self):
+        return {'message': 'Hello, world'}
+    
+api.add_resource(HelloWorld, '/api/hello')
 
 @app.route('/')
 async def home():
