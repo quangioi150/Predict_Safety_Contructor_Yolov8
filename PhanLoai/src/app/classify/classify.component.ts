@@ -38,56 +38,58 @@ export class ClassifyComponent {
   errorMessage: string | null = null;
 
 
-  // onFileSelected(event: any) {
-  //   this.selectedFile = event.target.files[0];
-  //   this.errorMessage = null;
-  //   this.imageUrl = null;
-  // }
+  onFileSelected(event: any) {
+    this.selectedFile = event.target.files[0];
+    this.errorMessage = null;
+    this.imageUrl = null;
+  }
 
-  // onUpload() {
-  //   if (this.selectedFile) {
-  //     this.backendService.uploadImage(this.selectedFile)
-  //       .subscribe(
-  //         (response) => {
-  //           this.imageUrl = response.imageUrl;
-  //           console.log(this.imageUrl)
-  //           this.errorMessage = this.imageUrl;
+  onUpload() {
+    if (this.selectedFile) {
+      this.backendService.uploadImage(this.selectedFile)
+        .subscribe(
+          (response) => {
+            this.imageUrl = response.imageUrl;
+            console.log(this.imageUrl)
+            this.errorMessage = this.imageUrl;
 
-  //         },
-  //         (error) => {
-  //           this.errorMessage = 'Error uploading image.';
-  //         }
-  //       );
-  //   } else {
-  //     this.errorMessage = 'Please select an image file.';
-  //   }
-  // }
+          },
+          (error) => {
+            this.errorMessage = 'Error uploading image.';
+          }
+        );
+    } else {
+      this.errorMessage = 'Please select an image file.';
+    }
+  }
 
 
   
   @ViewChild('videoElement', { static: true }) videoElement: ElementRef;
 
   stream: MediaStream;
+  link = ''
 
   startCamera() {
-    this.imageURL =''
-    this.videoUrl = ''
-    document.querySelector('.regular').classList.remove('none') 
+    // this.imageURL =''
+    // this.videoUrl = ''
+    // document.querySelector('.regular').classList.remove('none') 
     
-    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-      navigator.mediaDevices.getUserMedia({ video: true })
-        .then(stream => {
-          this.stream = stream;
-          const video = this.videoElement.nativeElement;
-          video.srcObject = stream;
-          video.play();
-        })
-        .catch(error => {
-          console.error('Error accessing camera:', error);
-        });
-    } else {
-      console.error('getUserMedia is not supported');
-    }
+    // if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+    //   navigator.mediaDevices.getUserMedia({ video: true })
+    //     .then(stream => {
+    //       this.stream = stream;
+    //       const video = this.videoElement.nativeElement;
+    //       video.srcObject = stream;
+    //       video.play();
+    //     })
+    //     .catch(error => {
+    //       console.error('Error accessing camera:', error);
+    //     });
+    // } else {
+    //   console.error('getUserMedia is not supported');
+    // }
+    this.link = 'http://127.0.0.1:5000/video_feed_camera'
   }
 
   stopCamera() {
@@ -102,6 +104,17 @@ export class ClassifyComponent {
       // Clear the srcObject property
       video.srcObject = null;
     }
+  }
+
+  stop() {
+    this.link = 'http://127.0.0.1:5000/camera_stop'
+
+  }
+  makeGetRequest() {
+    const url = 'http://127.0.0.1:5000/api/hello';
+    this.http.get(url, { withCredentials: true }).subscribe(response => {
+      alert(response['message'])
+    });
   }
   
   public userList: Result[] = [];
@@ -128,6 +141,7 @@ export class ClassifyComponent {
     reader.onload = (e: any) => {
       if(fileType.startsWith('image/') || // Check MIME type for image files
     ['jpg', 'jpeg', 'png', 'gif'].includes(file.name.split('.').pop())) {
+      this.videoUrl = ''
       this.imageURL = e.target.result
       document.querySelector('.regular').classList.add('none') 
     }
@@ -140,6 +154,9 @@ export class ClassifyComponent {
 
     reader.readAsDataURL(file);
     console.log(this.videoUrl)
+    console.log(this.imageURL)
+    this.selectedFile = file
+    console.log( this.selectedFile)
     // const file = (event.target as HTMLInputElement).files[0];
     // this.uploadForm.patchValue({
     //   avatar: file
@@ -190,12 +207,19 @@ export class ClassifyComponent {
   
 
   classify() {
-    // let userid = this.userInfor.UserID
-    let linkImg = "http.com"
-    let img = this.uploadForm.controls["avatar"].value
+    console.log( this.selectedFile)
+
     let formData = new FormData
-    formData.append("file",img)
-    console.log(img)
+    formData.append("file",this.selectedFile)
+    const url = 'http://127.0.0.1:5000/';
+    this.http.post(url,formData).subscribe(response => {
+      let filename = response['filename']
+      this.imageURL = `../../assets/${filename}`
+    });
+    // let img = this.uploadForm.controls["avatar"].value
+    // let userid = this.userInfor.UserID
+    // let linkImg = "http.com"
+    // console.log(img)
     
     // this.resultService.addResult(userid, linkImg, formData).subscribe({
     //   next: (data:any )=> {
