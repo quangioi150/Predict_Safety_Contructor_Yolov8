@@ -89,3 +89,14 @@ body{
     height: 480px;
     background-image: url('static/img/noneimage.jpg');
 }
+#title{
+    font-size: 30px;
+    margin-left: 80px;
+}
+.safety {
+    color: green;
+}
+
+.dangerous {
+    color: red;
+}
