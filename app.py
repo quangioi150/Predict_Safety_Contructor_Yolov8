@@ -14,6 +14,7 @@ import io
 import requests
 from threading import Thread
 from flask_restful import Api, Resource
+from data.db import *
 
 
 from utils import detect_sample_model, add_bboxs_on_img, object_json, save_object, get_prediction
@@ -259,6 +260,70 @@ async def video_feed_video(filename):
     # filename = session.get('filename')
     
     return Response(generate_frames_video(filename), mimetype='multipart/x-mixed-replace; boundary=frame')
+
+
+## Login , Logout
+conn = connect()
+
+class User:
+    def __init__(self, HoTen, TenDN, DiaChi, NgaySinh, MatKhau):
+        self.HoTen = HoTen
+        self.TenDN = TenDN
+        self.DiaChi = DiaChi
+        self.NgaySinh = NgaySinh
+        self.MatKhau = MatKhau
+
+@app.route("/login", methods=["POST"])
+async def login_user():
+    user = request.form.get("user")
+    password = request.form.get("password")
+    results = Login(conn, user, password)
+    if not results:
+        return {"error": f"User with this id {id} does not exist"}, 404
+    return results
+
+@app.route("/delete_result_by_id/<id>", methods=["DELETE"])
+async def delete_result_by_id(id):
+    results = delete_result_by_id(conn, id)
+    return results
+
+@app.route("/get/<id>", methods=["GET"])
+async def get_user(id):
+    user = get_user_by_id(conn, id)
+    return user
+
+@app.route("/user", methods=["POST"])
+async def insert_user():
+    HoTen = request.form.get("HoTen")
+    TenDN = request.form.get("TenDN")
+    DiaChi = request.form.get("DiaChi")
+    NgaySinh = request.form.get("NgaySinh")
+    MatKhau = request.form.get("MatKhau")
+    insert_user(conn, HoTen, TenDN, DiaChi, NgaySinh, MatKhau)
+    return {
+        "HoTen": HoTen,
+        "TenDN": TenDN,
+        "DiaChi": DiaChi,
+        "NgaySinh" : NgaySinh,
+        "MatKhau" : MatKhau,
+    }
+    
+@app.route("/update_user/<UserID>", methods=["PUT"])
+async def update_user(UserID):
+    HoTen = request.form.get("HoTen")
+    TenDN = request.form.get("TenDN")
+    DiaChi = request.form.get("DiaChi")
+    NgaySinh = request.form.get("NgaySinh")
+    MatKhau = request.form.get("MatKhau")
+    update_table_users(conn, UserID, HoTen, TenDN, DiaChi, NgaySinh, MatKhau)
+    return {
+        "UserID": UserID,
+        "HoTen": HoTen,
+        "TenDN": TenDN,
+        "DiaChi": DiaChi,
+        "NgaySinh" : NgaySinh,
+        "MatKhau" : MatKhau,
+    }
 
 if __name__ == '__main__':
     app.run(debug = True)
