@@ -67,12 +67,7 @@ def generate_frames_camera():
             yield (b'--frame\r\n'
                    b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
             
-def generate_frames_video(filename):
-    
-    if os.path.isdir("static/result"):
-        shutil.rmtree("static/result")
-    os.mkdir("static/result")
-    video = cv2.VideoCapture("static/uploads/" + filename)
+def generate_frames_video(video):
     while True:
         success, frame = video.read()
         if not success:
@@ -256,10 +251,8 @@ async def upload_video():
             
 @app.route('/video_feed_video/<filename>')
 async def video_feed_video(filename):
-    
-    # filename = session.get('filename')
-    
-    return Response(generate_frames_video(filename), mimetype='multipart/x-mixed-replace; boundary=frame')
+    video = cv2.VideoCapture("static/uploads/" + filename)
+    return Response(generate_frames_video(video), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 
 ## Login , Logout
