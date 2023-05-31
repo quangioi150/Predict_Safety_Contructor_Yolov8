@@ -157,15 +157,10 @@ async def upload_image():
 
         filename = "{}_predict.jpg".format(name_image[0])
         
-        # return render_template('index.html', filename=filename, dangerous=dangerous)
-        return { 'dangerous' : dangerous,
-                'filename': filename}
-    
-    # else:
-        
-    #     flash("Allowed image types are - png, jpg, jpeg")
-        
-    #     return redirect(request.url)
+        return { 
+            'dangerous' : dangerous,
+            'filename': filename
+        }
     
 
 @app.route('/display/<filename>')
