@@ -6,6 +6,7 @@ import numpy as np
 import cv2
 import datetime
 from threading import Thread
+from data.db import *
 
 from typing import Optional
 import json 
@@ -187,6 +188,7 @@ def save_object(input_image):
                 
     classes = predict['name']
     for cls in classes:
+        
         object = crop_image_by_predict(input_image, predict, crop_class_name = cls)
         object.save("{}/{}.jpg".format(folder_path,cls))
 
@@ -239,3 +241,60 @@ def get_prediction(input_image):
     
     return image, dangerous
 
+
+def create_folder(path):
+    
+    today = datetime.date.today().strftime("%Y-%m-%d")
+    folder_path = os.path.join(path, today)
+    
+    os.makedirs(folder_path, exist_ok=True)
+    
+    # Get the count of existing folders
+    existing_folders = sum(
+        1 for entry in os.scandir(folder_path)
+        if entry.is_dir() and entry.name.startswith("run")
+    )
+
+    # Generate a new folder name
+    folder_name = f"run{existing_folders + 1}"
+    folder_path = os.path.join(folder_path, folder_name)
+
+    # Create a new folder
+    os.mkdir(folder_path)
+    
+    return folder_path
+
+
+def get_parameters(conn, image, user_id):
+    
+    image_predict, dangerous = get_prediction(image)
+    if len(dangerous) == 0:
+        predictions = 'SAFETY'
+    else:
+        predictions = dangerous
+        
+    folder_path = create_folder(path = './static/object/')
+    image_id = get_image_id_current(conn)
+    result = object_json(image)
+    
+    path_image = folder_path + "/predict.jpg"
+    cv2.imwrite(path_image, image_predict)
+    Images = folder_path
+    
+    insert_images(conn, user_id, Images, predictions)
+    print(user_id)
+    print(Images)
+    print(predictions)
+    NgayTest = "2001-10-05"
+    
+    for obj in result['detect_objects']:
+        
+        name = obj["name"]
+        confidence = obj["confidence"]
+        
+        insert_results(conn, image_id, name, NgayTest, confidence)
+        print(image_id, name, confidence)
+        
+        
+        
+        
