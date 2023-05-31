@@ -280,7 +280,7 @@ async def login_user():
     results = Login(conn, user, password)
     if not results:
         return {"error": f"User with this id {id} does not exist"}, 404
-    return results
+    return  results
 
 @app.route("/delete_result_by_id/<id>", methods=["DELETE"])
 async def delete_result_by_id(id):

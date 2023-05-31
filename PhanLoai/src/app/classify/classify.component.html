@@ -10,7 +10,7 @@
             </div>
         </div>
         <div class="be-right-navbar d-flex align-items-center">
-            <!-- <strong class="text-white mr-3">Xin chào, {{userInfor.HoTen}}</strong> -->
+            <strong class="text-white mr-3">Xin chào, {{userInfor.HoTen}}</strong>
             <div style="margin-left: 10px;">
                 <button
                     pButton
@@ -27,7 +27,7 @@
 <div class="container">
 
     <div class="row">
-        <div class="col-lg-8">
+        <div class="col-lg-7">
             <div class="container1">
                 <!-- <video #videoElement class="regular"  style=" width: 100% ; border:2px solid #000" >
                 </video> -->
@@ -60,7 +60,7 @@
                 <!-- <input  pInputText type="file" (change)="showPreview($event)" /> -->
             </div>
         </div>
-        <div class="col-lg-4" >
+        <div class="col-lg-5" >
             
 
         <div style="margin-bottom:10px; margin-top:20px ">
@@ -79,23 +79,91 @@
                             </tr>
                             <tr>
                                 <th >Họ tên</th>
-                                <!-- <td>{{userInfor.HoTen}}</td> -->
+                                <td>{{userInfor.HoTen}}</td>
                             </tr>
                             <tr>
                                 <th >Tên đăng nhập</th>
-                                <!-- <td>{{userInfor.TenDN}}</td> -->
+                                <td>{{userInfor.TenDN}}</td>
                             </tr>
                             <tr>
                                 <th>Ngày sinh</th>
-                                <!-- <td>{{userInfor.NgaySinh}}</td> -->
+                                <td>{{userInfor.NgaySinh}}</td>
                             </tr>
                             <tr>
                                 <th>Địa chỉ</th>
-                                <!-- <td>{{userInfor.DiaChi}}</td> -->
+                                <td>{{userInfor.DiaChi}}</td>
                             </tr>
                         </tbody>                
                     </table>
                     <div class="mr-3" style="display: inline-block; margin-right: 10px">
+                        <p-table
+                    [value]="userList"
+                    [paginator]="true"
+                    [rows]="3"
+                    [rowsPerPageOptions]="[3,5]"
+                    [globalFilterFields]="['TenBenh']"
+                    styleClass="p-datatable-sm p-datatable-striped p-datatable-gridlines"
+                    responsiveLayout="scroll">
+                    <ng-template pTemplate="header">
+                      <tr>
+                        <th class="text-center">ID</th>
+                        <th class="text-center" id="STT">Ngày</th>
+                        <th class="text-center" id="Ten">Ảnh</th>
+                        <th class="text-center" id="Ten">Loại bệnh
+                            <p-columnFilter
+                                type="text"
+                                field="TenBenh"
+                                display="menu"
+                            ></p-columnFilter>        
+                        </th>
+                        <th class="text-center" id="ThaoTac">Độ chính xác</th>
+                        <th class="text-center" id="ThaoTac">Hành động</th>
+                      </tr>
+                      
+                    </ng-template>
+                    <ng-template pTemplate="body" let-item let-rowIndex="rowIndex" >
+                      <tr>
+                        <td>
+                            {{ item.ResultID }}
+                        </td>
+                        <td class="text-center" >
+                            {{ item.NgayTest  }}
+                        </td>
+                        <td class="text-truncate" >
+                            {{ item.LinkImg }}
+                        </td>
+                        <td class="text-center"  >
+                            {{ item.TenBenh }}
+                        </td>
+                        <td class="text-center"  >
+                            {{ item.DoChinhXac * 100 | number }}%
+                        </td>
+                        
+                        <td style="width: 8rem">
+                          <div class="d-flex justify-content-center">
+                            <button
+                              pButton
+                              type="button"
+                              icon="pi pi-trash"
+                              pTooltip="Xóa"
+                              tooltipPosition="bottom"
+                              (click)="deleteResult1(item.ResultID)"
+                              class="p-button-text p-button-danger p-button-sm"></button>
+                          </div>
+                        </td>
+                      </tr>
+                    </ng-template>
+                    <ng-template  pTemplate="emptymessage" let-columns>
+                        <tr>
+                          <td colspan="12" class="text-center">
+                            <img style="width: 180px;" src="/assets/nodata.PNG" alt="">
+                          </td>
+                        </tr>
+                      </ng-template>
+                    <ng-template pTemplate="summary">
+                      <div class="p-d-flex p-ai-center p-jc-between">Tổng: {{userList.length}} kết quả.</div>
+                    </ng-template>
+                  </p-table>
 
                         <!-- <button (click)="userEdit(userInfor.UserID)" pButton icon="pi pi-pencil" label="Sửa thông tin cá nhân"></button> -->
                     </div>

@@ -3,4 +3,29 @@
     <div>
         <img src="{{ url_for('video_feed_video') }}">
     </div>
+    <div class="col p-4 bg-dark text-white ketqua">
+        <p id="title"></p>
+        <p id="result"></p>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+        <script>
+            function updateResult() {
+                $.ajax({
+                    url: "/result",
+                    type: "GET",
+                    cache: false,
+                    success: function(response) {
+                       if (response["danger"] == "") {
+                            $('#result').text(response);
+                             $('#title').text("SAFETY").removeClass('dangerous').addClass('safety');
+                        } else {
+                            $('#result').text(response);
+                             $('#title').text("DANGEROUS").removeClass('safety').addClass('dangerous');
+                        }
+                    }
+                });
+            }
+            setInterval(updateResult, 100);
+        </script>
+    </div>
 {% endblock body %}

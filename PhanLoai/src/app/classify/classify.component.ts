@@ -146,7 +146,7 @@ export class ClassifyComponent {
   videoUrl: string;
   uploadForm: FormGroup;
   imageURL: string = '';
-  // public userInfor = JSON.parse(localStorage.getItem("userInfo")).User
+  public userInfor = JSON.parse(localStorage.getItem("userInfo")).User
   ngOnInit(): void {
     this.getAllResult()
     this.uploadForm = this.fb.group({
@@ -293,6 +293,7 @@ export class ClassifyComponent {
         const url = 'http://127.0.0.1:5000/upload_video';
         this.http.post(url,formData).subscribe(response => {
           this.link = `http://127.0.0.1:5000/video_feed_video/${response['filename']}`
+          this.intervalId = setInterval(() => this.updateResult(), 2000);
           this.videoUrl =''
           this.imageURL = ''
         });

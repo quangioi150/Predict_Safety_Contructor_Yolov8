@@ -8,7 +8,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 })
 export class UserServiceService {
 
-  private readonly baseURL = "http://localhost:5000"
+  private readonly baseURL = "http://127.0.0.1:5000/"
 
   constructor(private httpClient: HttpClient, private router: Router) { }
 
@@ -17,10 +17,15 @@ export class UserServiceService {
   }
   isLogin= new BehaviorSubject<boolean>(false)
   public login(TenDN: string, MatKhau: string) {
-    var body =null
+    const body = new FormData();
+    body.append('user', TenDN);
+    body.append('password', MatKhau);
+    // var body = {
+    //   user: TenDN,
+    //   password: MatKhau
+    // }
 
-    var param = `/login?TenDN=${TenDN}&MatKhau=${MatKhau}`
-      return this.httpClient.post<any>(this.baseURL+param, body)
+      return this.httpClient.post<any>(this.baseURL+'login', body)
   }
 
   public register(HoTen: string, TenDN: string, DiaChi: string, NgaySinh: string, MatKhau: string) {
