@@ -8,7 +8,7 @@ def connect():
             port="5432",
             database="postgres",
             user="postgres",
-            password="1234"
+            password="123456"
             # options="-c search_path=Safety_PPE"
         )
         print("Connected to PostgreSQL")

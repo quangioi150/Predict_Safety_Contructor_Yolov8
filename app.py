@@ -153,7 +153,7 @@ async def upload_image():
         name_image = re.findall(pattern_name, filename)
 
         cv2.imwrite("static/uploads/{}_predict.jpg".format(name_image[0]), image)
-        cv2.imwrite("D:/VIETDONG/Predict_Safety_Contructor_Yolov8/PhanLoai/src/assets/{}_predict.jpg".format(name_image[0]), image)
+        cv2.imwrite("D:/tai lieu/NCKH_KHMT/Predict_Safety_Contructor_Yolov8/PhanLoai/src/assets/{}_predict.jpg".format(name_image[0]), image)
 
         filename = "{}_predict.jpg".format(name_image[0])
         
