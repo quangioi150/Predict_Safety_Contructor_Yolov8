@@ -1,5 +1,6 @@
 import psycopg2
-
+from PIL import Image
+import io
 # Kết nối đến cơ sở dữ liệu PostgreSQL
 def connect():
     try:
@@ -36,18 +37,26 @@ def create_tables(conn):
                                     DiaChi TEXT NOT NULL,
                                     NgaySinh DATE,
                                     MatKhau TEXT NOT NULL);"""
-
+                                    
+        # Câu lệnh tạo bảng IMAGES
+        create_table_images = """CREATE TABLE IF NOT EXISTS IMAGES(
+                                    UserID INTEGER,
+                                    ImageID SERIAL PRIMARY KEY,
+                                    Images TEXT NOT NULL,
+                                    Prediction TEXT NOT NULL,
+                                    FOREIGN KEY(UserID) REFERENCES USERS(UserID));"""
+        
         # Câu lệnh tạo bảng RESULTS
         create_table_results = """CREATE TABLE IF NOT EXISTS RESULTS(
                                     ResultID SERIAL PRIMARY KEY,
-                                    UserID INTEGER,
-                                    LinkImg TEXT NOT NULL,
-                                    TenBenh TEXT NOT NULL,
+                                    ImageID INTEGER,
+                                    NameObject TEXT NOT NULL,
                                     NgayTest DATE NOT NULL,
                                     DoChinhXac FLOAT NOT NULL,
-                                    FOREIGN KEY(UserID) REFERENCES USERS(UserID));"""
+                                    FOREIGN KEY(ImageID) REFERENCES IMAGES(ImageID));"""
 
         cursor.execute(create_table_users)
+        cursor.execute(create_table_images)
         cursor.execute(create_table_results)
         conn.commit()
         print("PostgreSQL tables created")
@@ -73,17 +82,38 @@ def insert_user(conn, HoTen, TenDN, DiaChi, NgaySinh, MatKhau):
         cursor.close()
     except (Exception, psycopg2.DatabaseError) as error:
         print("Failed to insert record into USERS table", error)
+ 
+ 
+# Thêm bản ghi vào bảng IMAGES       
+def insert_images(conn, UserID, Images, Prediction):
+    try:
+        cursor = conn.cursor()
+        
+        # images = open(Images, 'rb').read()
+
+        insert_query = """INSERT INTO IMAGES
+                          ( UserID, Images, Prediction)
+                          VALUES ( %s, %s, %s);"""
+
+        data = ( UserID, Images, Prediction)
+        cursor.execute(insert_query, data)
+        conn.commit()
+        print("Record inserted successfully into IMAGES table")
+
+        cursor.close()
+    except (Exception, psycopg2.DatabaseError) as error:
+        print("Failed to insert record into IMAGES table", error)
 
 # Thêm bản ghi vào bảng RESULTS
-def insert_results(conn, UserID, LinkImg, TenBenh, NgayTest, DoChinhXac):
+def insert_results(conn, ImageID, NameObject, NgayTest, DoChinhXac):
     try:
         cursor = conn.cursor()
 
         insert_query = """INSERT INTO RESULTS
-                          (UserID, LinkImg, TenBenh, NgayTest, DoChinhXac)
-                          VALUES (%s, %s, %s, %s, %s);"""
+                          (ImageID, NameObject, NgayTest, DoChinhXac)
+                          VALUES (%s, %s, %s, %s);"""
 
-        data = (UserID, LinkImg, TenBenh, NgayTest, DoChinhXac)
+        data = (ImageID, NameObject, NgayTest, DoChinhXac)
         cursor.execute(insert_query, data)
         conn.commit()
         print("Record inserted successfully into RESULTS table")
@@ -91,16 +121,21 @@ def insert_results(conn, UserID, LinkImg, TenBenh, NgayTest, DoChinhXac):
         cursor.close()
     except (Exception, psycopg2.DatabaseError) as error:
         print("Failed to insert record into RESULTS table", error)
-
+        
 # Lấy thông tin người dùng theo UserID
 def get_user_by_id(conn, id):
     try:
         cursor = conn.cursor()
 
-        select_query = """SELECT * FROM RESULTS WHERE UserID = %s;"""
+        # select_query = """SELECT * FROM RESULTS WHERE UserID = %s;"""
+        select_query = """SELECT UserID, ResultID, i.ImageID, Prediction, NameObject, DoChinhXac, Images, r.NgayTest
+                            FROM safety_ppe.RESULTS AS r
+                            INNER JOIN safety_ppe.IMAGES AS i ON r.ImageID = i.ImageID
+                            WHERE UserID = %s;"""
+                            
         cursor.execute(select_query, (id,))
         records = cursor.fetchall()
-        columns = ("ResultID", "UserID", "LinkImg", "TenBenh", "NgayTest", "DoChinhXac")
+        columns = ("UserID", "ResultID", "ImageID", "Prediction", "NameObject", "DoChinhXac", "Images", "NgayTest")
         results = [dict(zip(columns, record)) for record in records]
 
         cursor.close()
@@ -156,6 +191,22 @@ def update_table_users(conn, UserID, HoTen, TenDN, DiaChi, NgaySinh, MatKhau):
     except (Exception, psycopg2.DatabaseError) as error:
         print("Failed to update PostgreSQL table", error)
 
+# Lấy imageID hiện tại
+def get_image_id_current(conn):
+    try:
+        cursor = conn.cursor()
+
+        query = """SELECT MAX(imageid) AS max_imageid FROM safety_ppe.images;"""
+
+        cursor.execute(query,)
+        image_id = cursor.fetchall()[0][0]
+        conn.commit()
+        print("Record deleted successfully from RESULTS table")
+
+        cursor.close()
+        return image_id
+    except (Exception, psycopg2.DatabaseError) as error:
+        print("Failed to delete record from RESULTS table", error)
 
 # Xóa bản ghi từ bảng RESULTS theo ResultID
 def delete_result_by_id(conn, id):
@@ -175,24 +226,34 @@ if __name__ == '__main__':
     # Kết nối đến cơ sở dữ liệu
     conn = connect()
 
-    create_tables(conn)
+    # create_tables(conn)
 
-    # Thêm người dùng vào bảng USERS
-    insert_user(conn, "Hoàng Cao Minh", "HoangCaoMinh", "Thái Bình", "2001-10-05", "1234")
-    insert_user(conn, "Đỗ Viết Đông", "DoVietDong", "Thái Bình", "2001-10-01", "1234")
+    # # Thêm người dùng vào bảng USERS
+    # insert_user(conn, "Hoàng Cao Minh", "HoangCaoMinh", "Thái Bình", "2001-10-05", "1234")
+    # insert_user(conn, "Đỗ Viết Đông", "DoVietDong", "Thái Bình", "2001-10-01", "1234")
 
-    # Thêm kết quả vào bảng RESULTS
-    insert_results(conn, 1, "http.com.net", "Bệnh lá trắng", "2001-10-05", 99.83)
-    insert_results(conn, 1, "http.com.net", "Bệnh lá nâu", "2001-10-05", 99.83)
-    insert_results(conn, 2, "http.com.net", "Bệnh lá đen", "2001-10-05", 99.83)
-    insert_results(conn, 2, "http.com.net", "Bệnh lá vàng", "2001-10-05", 99.83)
+    # # Thêm image vào bảng IMAGES
+    # insert_images(conn, 1, "static/uploads/prediction.jpg", 'SAFETY')
+    # insert_images(conn, 1, "static/uploads/prediction.jpg", 'DANGEROUS')
+    # insert_images(conn, 2, "static/uploads/prediction.jpg", 'SAFETY')
+    # insert_images(conn, 2, "static/uploads/prediction.jpg", 'DANGEROUS')
+    
+    # # Thêm kết quả vào bảng RESULTS
+    # insert_results(conn, 1, "NO-SafetyVest", "2001-10-05", 0.9262253642)
+    # insert_results(conn, 2, "Person", "2001-10-05", 0.9262253642)
+    # insert_results(conn, 3, "SafetyVest", "2001-10-05", 0.9262253642)
+    # insert_results(conn, 1, "NO-Hardhat", "2001-10-05", 0.9262253642)
+    # insert_results(conn, 4, "NO-SafetyVest", "2001-10-05", 0.9262253642)
+
 
     # Lấy thông tin người dùng theo UserID
-    # user_results = get_user_by_id(conn, 1)
-    # print(user_results)
+    user_results = get_user_by_id(conn, 1)
+    print(user_results)
 
     # Xóa bản ghi từ bảng RESULTS theo ResultID
     # delete_result_by_id(conn, 1)
 
     # Đóng kết nối đến cơ sở dữ liệu
+    # image_id = get_image_id_current(conn)
+    # print(image_id)
     conn.close()

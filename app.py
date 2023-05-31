@@ -17,7 +17,7 @@ from flask_restful import Api, Resource
 from data.db import *
 
 
-from utils import detect_sample_model, add_bboxs_on_img, object_json, save_object, get_prediction
+from utils import detect_sample_model, add_bboxs_on_img, object_json, save_object, get_prediction, get_parameters
 
 dangerous_str = ""
 
@@ -140,6 +140,7 @@ async def upload_image():
         if "NO-Mask" in objects_detect:
             dangerous.append("NO-Mask")
 
+        get_parameters(conn, image = input_image, user_id= 1)
         # add bbox on image
         final_image = add_bboxs_on_img(image = input_image, predict = predict)
         # image = cv2.cvtColor(np.array(final_image), cv2.COLOR_RGB2BGR)
@@ -148,7 +149,8 @@ async def upload_image():
         name_image = re.findall(pattern_name, filename)
 
         cv2.imwrite("static/uploads/{}_predict.jpg".format(name_image[0]), image)
-        cv2.imwrite("D:/VIETDONG/Predict_Safety_Contructor_Yolov8/PhanLoai/src/assets/{}_predict.jpg".format(name_image[0]), image)
+        # cv2.imwrite("D:/VIETDONG/Predict_Safety_Contructor_Yolov8/PhanLoai/src/assets/{}_predict.jpg".format(name_image[0]), image)
+        cv2.imwrite("/PhanLoai/src/assets/{}_predict.jpg".format(name_image[0]), image)
 
         filename = "{}_predict.jpg".format(name_image[0])
         
