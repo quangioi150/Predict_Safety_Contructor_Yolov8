@@ -95,6 +95,7 @@
                             </tr>
                         </tbody>                
                     </table>
+                    <div *ngFor ="let item of resultsByID">{{item['DoChinhXac']}}</div>
                     <div class="mr-3" style="display: inline-block; margin-right: 10px">
                         <p-table
                     [value]="userList"

@@ -35,7 +35,7 @@ def create_tables(conn):
                                     HoTen TEXT NOT NULL,
                                     TenDN TEXT NOT NULL,
                                     DiaChi TEXT NOT NULL,
-                                    NgaySinh DATE,
+                                    NgaySinh TEXT,
                                     MatKhau TEXT NOT NULL);"""
                                     
         # Câu lệnh tạo bảng IMAGES
@@ -51,7 +51,7 @@ def create_tables(conn):
                                     ResultID SERIAL PRIMARY KEY,
                                     ImageID INTEGER,
                                     NameObject TEXT NOT NULL,
-                                    NgayTest DATE NOT NULL,
+                                    NgayTest TEXT NOT NULL,
                                     DoChinhXac FLOAT NOT NULL,
                                     FOREIGN KEY(ImageID) REFERENCES IMAGES(ImageID));"""
 
@@ -200,8 +200,11 @@ def get_image_id_current(conn):
 
         cursor.execute(query,)
         image_id = cursor.fetchall()[0][0]
+        if image_id == None:
+            image_id = 1
+        
         conn.commit()
-        print("Record deleted successfully from RESULTS table")
+        print("Recordsuccessfully from RESULTS table")
 
         cursor.close()
         return image_id
@@ -226,19 +229,19 @@ if __name__ == '__main__':
     # Kết nối đến cơ sở dữ liệu
     conn = connect()
 
-    # create_tables(conn)
+    create_tables(conn)
 
-    # # Thêm người dùng vào bảng USERS
+    # Thêm người dùng vào bảng USERS
     # insert_user(conn, "Hoàng Cao Minh", "HoangCaoMinh", "Thái Bình", "2001-10-05", "1234")
     # insert_user(conn, "Đỗ Viết Đông", "DoVietDong", "Thái Bình", "2001-10-01", "1234")
 
-    # # Thêm image vào bảng IMAGES
-    # insert_images(conn, 1, "static/uploads/prediction.jpg", 'SAFETY')
+    # Thêm image vào bảng IMAGES
+    # insert_images(conn, 1, "./", 'DANGEROUS')
     # insert_images(conn, 1, "static/uploads/prediction.jpg", 'DANGEROUS')
     # insert_images(conn, 2, "static/uploads/prediction.jpg", 'SAFETY')
     # insert_images(conn, 2, "static/uploads/prediction.jpg", 'DANGEROUS')
     
-    # # Thêm kết quả vào bảng RESULTS
+    # Thêm kết quả vào bảng RESULTS
     # insert_results(conn, 1, "NO-SafetyVest", "2001-10-05", 0.9262253642)
     # insert_results(conn, 2, "Person", "2001-10-05", 0.9262253642)
     # insert_results(conn, 3, "SafetyVest", "2001-10-05", 0.9262253642)
@@ -247,13 +250,13 @@ if __name__ == '__main__':
 
 
     # Lấy thông tin người dùng theo UserID
-    user_results = get_user_by_id(conn, 1)
-    print(user_results)
+    # user_results = get_user_by_id(conn, 1)
+    # print(user_results)
 
     # Xóa bản ghi từ bảng RESULTS theo ResultID
     # delete_result_by_id(conn, 1)
 
     # Đóng kết nối đến cơ sở dữ liệu
-    # image_id = get_image_id_current(conn)
-    # print(image_id)
+    image_id = get_image_id_current(conn)
+    print(image_id)
     conn.close()

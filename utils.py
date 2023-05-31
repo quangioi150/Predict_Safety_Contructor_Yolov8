@@ -17,7 +17,7 @@ from ultralytics.yolo.utils.plotting import Annotator, colors
 # Initialize the models
 model_sample_model = YOLO("./models/best.pt")
 
-
+today = datetime.date.today().strftime("%d-%m-%Y")
 
 
 def transform_predict_to_df(results: list, labeles_dict: dict) -> pd.DataFrame:
@@ -244,7 +244,7 @@ def get_prediction(input_image):
 
 def create_folder(path):
     
-    today = datetime.date.today().strftime("%Y-%m-%d")
+    today = datetime.date.today().strftime("%d-%m-%Y")
     folder_path = os.path.join(path, today)
     
     os.makedirs(folder_path, exist_ok=True)
@@ -257,7 +257,7 @@ def create_folder(path):
 
     # Generate a new folder name
     folder_name = f"run{existing_folders + 1}"
-    folder_path = os.path.join(folder_path, folder_name)
+    folder_path = folder_path + "/" + folder_name
 
     # Create a new folder
     os.mkdir(folder_path)
@@ -271,29 +271,30 @@ def get_parameters(conn, image, user_id):
     if len(dangerous) == 0:
         predictions = 'SAFETY'
     else:
-        predictions = dangerous
-        
-    folder_path = create_folder(path = './static/object/')
-    image_id = get_image_id_current(conn)
+        predictions = 'Dangerous'
+
+    folder_path = create_folder(path = './PhanLoai/src/assets/')
     result = object_json(image)
     
     path_image = folder_path + "/predict.jpg"
     cv2.imwrite(path_image, image_predict)
-    Images = folder_path
+    Images = path_image
     
     insert_images(conn, user_id, Images, predictions)
     print(user_id)
     print(Images)
     print(predictions)
-    NgayTest = "2001-10-05"
-    
+    NgayTest = today
+    image_id = get_image_id_current(conn)
+    print('-----',image_id)
     for obj in result['detect_objects']:
         
         name = obj["name"]
         confidence = obj["confidence"]
         
         insert_results(conn, image_id, name, NgayTest, confidence)
-        print(image_id, name, confidence)
+        print('------name',name)
+        # print(image_id, name, confidence)
         
         
         
