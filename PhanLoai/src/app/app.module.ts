@@ -10,6 +10,7 @@ import {CheckboxModule} from 'primeng/checkbox';
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import {DividerModule} from 'primeng/divider';
 import {CalendarModule} from 'primeng/calendar';
+import { CardModule } from 'primeng/card';
 import { MessageService } from 'primeng/api';
 import {InputTextModule} from 'primeng/inputtext';
 import { ClassifyComponent } from './classify/classify.component';
@@ -45,7 +46,8 @@ import {DynamicDialogModule} from 'primeng/dynamicdialog';
     ToastModule,
     BrowserAnimationsModule,
     InplaceModule,
-    DynamicDialogModule
+    DynamicDialogModule,
+    CardModule
   ],
   providers: [MessageService],
   bootstrap: [AppComponent]

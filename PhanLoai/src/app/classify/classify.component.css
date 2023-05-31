@@ -39,3 +39,18 @@
 .unset {
     display: block;
 }
+
+#title {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.red {
+    color: red;
+}
+
+.green {
+    color: green;
+}
+
+

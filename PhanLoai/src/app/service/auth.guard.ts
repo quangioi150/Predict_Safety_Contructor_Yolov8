@@ -8,18 +8,18 @@ import { UserServiceService } from './user-service.service';
 })
 export class AuthGuard  {
   constructor(private router: Router, private userService: UserServiceService) {}
-  // canActivate(
-  //   route: ActivatedRouteSnapshot,
-  //   state: RouterStateSnapshot): boolean {
-  //     let userInfo = JSON.parse(localStorage.getItem("userInfo")).UserID;
-  //     if(userInfo !== 0)
-  //     {
-  //       return true;
+  canActivate(
+    route: ActivatedRouteSnapshot,
+    state: RouterStateSnapshot): boolean {
+      let userInfo = JSON.parse(localStorage.getItem("userInfo")).UserID;
+      if(userInfo !== 0)
+      {
+        return true;
 
-  //     }else{
-  //       this.router.navigate(["/login"])
-  //       return false;
-  //     }
-  // }
+      }else{
+        this.router.navigate(["/login"])
+        return false;
+      }
+  }
   
 }

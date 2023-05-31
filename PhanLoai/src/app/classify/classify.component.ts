@@ -2,7 +2,7 @@ import { Binary } from '@angular/compiler';
 import { ChangeDetectorRef, Component, ElementRef, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
-import { MessageService } from 'primeng/api';
+import { Message, MessageService } from 'primeng/api';
 import { DialogService } from 'primeng/dynamicdialog';
 import { Result } from '../interfaces/result.interface';
 import { User } from '../interfaces/user.interface';
@@ -16,7 +16,7 @@ import { interval } from 'rxjs';
   selector: 'app-classify',
   templateUrl: './classify.component.html',
   styleUrls: ['./classify.component.css'],
-  providers: [DialogService]
+  providers: [MessageService, DialogService]
 })
 
 export class ClassifyComponent {
@@ -32,7 +32,7 @@ export class ClassifyComponent {
     private backendService: ResultServiceService) {}
   imageUrl: string;
   dangerousObjects: string[];
-
+  intervalId: any;
   selectedFile: File | null = null;
   // imageUrl: string | null = null;
   errorMessage: string | null = null;
@@ -89,10 +89,29 @@ export class ClassifyComponent {
     // } else {
     //   console.error('getUserMedia is not supported');
     // }
-    this.link = 'http://127.0.0.1:5000/video_feed_camera'
+    this.countClick++;
+    this.imageURL = ''
+    this.videoUrl =''
+    if(this.countClick%2!=0) {
+      this.camStatus = 'Dừng camera'
+      this.isClicked = !this.isClicked
+      this.link = 'http://127.0.0.1:5000/video_feed_camera'
+      // this.updateResult();
+      // setInterval(() => this.updateResult(), 100);
+      this.intervalId = setInterval(() => this.updateResult(), 2000);
+    }
+    else {
+      this.camStatus = 'Camera'
+      this.isClicked = !this.isClicked
+      this.link = 'http://127.0.0.1:5000/camera_stop'
+      clearInterval(this.intervalId);
+      this.title =''
+    }
     
   }
-
+  camStatus: any = 'Camera'
+  countClick: any = 0
+  isClicked = false
   stopCamera() {
     if (this.stream) {
       const video = this.videoElement.nativeElement;
@@ -109,6 +128,8 @@ export class ClassifyComponent {
 
   stop() {
     this.link = 'http://127.0.0.1:5000/camera_stop'
+    clearInterval(this.intervalId);
+    this.title =''
 
   }
   makeGetRequest() {
@@ -125,30 +146,43 @@ export class ClassifyComponent {
   videoUrl: string;
   uploadForm: FormGroup;
   imageURL: string = '';
-  // public userInfor = JSON.parse(localStorage.getItem("userInfo")).User
+  public userInfor = JSON.parse(localStorage.getItem("userInfo")).User
   ngOnInit(): void {
     this.getAllResult()
     this.uploadForm = this.fb.group({
       avatar: [null],
     })
-    interval(100).subscribe(() => {
-      this.updateResult();
-    });
+    
+    
   }
+  title: any =''
+  result: any
+  messages: Message[]
   updateResult(): void {
-    this.http.get<string>('http://127.0.0.1:5000/result')
+    this.http.get('http://127.0.0.1:5000/result',{ withCredentials: true })
       .subscribe(response => {
-        if (response === '') {
-          document.getElementById('result').textContent = response;
-          document.getElementById('title').textContent = 'SAFETY';
-          document.getElementById('title').classList.remove('dangerous');
-          document.getElementById('title').classList.add('safety');
-        } else {
-          document.getElementById('result').textContent = response;
-          document.getElementById('title').textContent = 'DANGEROUS';
-          document.getElementById('title').classList.remove('safety');
-          document.getElementById('title').classList.add('dangerous');
-        }
+       
+          console.log(response['danger'])
+          if (response['danger'] === '') {
+            this.result = response['danger'];
+            this.title = 'SAFETY';
+            // document.querySelector("#title").classList.remove('red')
+            // document.querySelector("#title").classList.add('green')
+            this.messages = [
+              { severity: 'success', summary: 'SAFETY', detail: 'Everything good' },
+          ];
+            // this.messageService.add({severity:'success', summary:'SAFETY', detail:'Everything good'});
+          } else {
+            this.result = response['danger'];
+            this.title = 'DANGEROUS';
+            this.messages = [
+              { severity: 'error', summary: 'DANGEROUS', detail: response['danger'] },
+          ];
+            // document.querySelector("#title").classList.remove('green')
+            // document.querySelector("#title").classList.add('red')
+            // this.messageService.add({severity:'error', summary:'DANGEROUS', detail:response['danger']});
+          }
+        
       });
   }
   
@@ -231,14 +265,43 @@ export class ClassifyComponent {
 
   classify() {
     console.log( this.selectedFile)
+    let check 
+    if (this.selectedFile) {
+      if (this.selectedFile.type.includes('image')) {
+        let formData = new FormData
+        formData.append("file",this.selectedFile)
+        const url = 'http://127.0.0.1:5000/';
+        this.http.post(url,formData).subscribe(response => {
+          if(response['dangerous'] === '') {
+            this.messages = [
+              { severity: 'success', summary: 'SAFETY', detail: 'Everything good' },
+            ];
 
-    let formData = new FormData
-    formData.append("file",this.selectedFile)
-    const url = 'http://127.0.0.1:5000/';
-    this.http.post(url,formData).subscribe(response => {
-      let filename = response['filename']
-      this.imageURL = `../../assets/${filename}`
-    });
+          }
+          else {
+            this.messages = [
+              { severity: 'error', summary: 'DANGEROUS', detail: response['dangerous'] },
+          ];
+          }
+          let filename = response['filename']
+          this.imageURL = `../../assets/${filename}`
+          this.title = response['dangerous']
+        });
+      } else if (this.selectedFile.type.includes('video')) {
+        let formData = new FormData
+        formData.append("file",this.selectedFile)
+        const url = 'http://127.0.0.1:5000/upload_video';
+        this.http.post(url,formData).subscribe(response => {
+          this.link = `http://127.0.0.1:5000/video_feed_video/${response['filename']}`
+          this.intervalId = setInterval(() => this.updateResult(), 2000);
+          this.videoUrl =''
+          this.imageURL = ''
+        });
+      } else {
+        console.log('Selected file is neither an image nor a video.');
+      }
+    }
+    
     // let img = this.uploadForm.controls["avatar"].value
     // let userid = this.userInfor.UserID
     // let linkImg = "http.com"

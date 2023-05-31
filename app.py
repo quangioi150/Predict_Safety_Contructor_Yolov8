@@ -41,8 +41,8 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 start_camera = 0
 cap = cv2.VideoCapture(0)
 cap.set(cv2.CAP_PROP_FPS, 30)
-cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
-cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+cap.set(cv2.CAP_PROP_FRAME_WIDTH, 700)
+cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 500)
 
 def allowed_file(filename):
     return '.'in filename and filename.rsplit('.', 1)[1].lower() in ALLOW_EXTENSIONS
@@ -153,7 +153,7 @@ async def upload_image():
         name_image = re.findall(pattern_name, filename)
 
         cv2.imwrite("static/uploads/{}_predict.jpg".format(name_image[0]), image)
-        cv2.imwrite("D:/NCKH/Predict_Safety_Contructor_Yolov8/PhanLoai/src/assets/{}_predict.jpg".format(name_image[0]), image)
+        cv2.imwrite("D:/VIETDONG/Predict_Safety_Contructor_Yolov8/PhanLoai/src/assets/{}_predict.jpg".format(name_image[0]), image)
 
         filename = "{}_predict.jpg".format(name_image[0])
         
@@ -208,11 +208,11 @@ async def video_feed_camera():
     
     return Response(generate_frames_camera(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
-@app.route('/result')
+@app.route('/result', methods=["GET"])
 async def result():
     global dangerous_str
     dangerous_text = dangerous_str
-    return dangerous_text
+    return {'danger': dangerous_text}
 
 @app.route('/camera_stop', methods=["GET"])
 async def start_or_stop():
@@ -275,7 +275,7 @@ async def login_user():
     results = Login(conn, user, password)
     if not results:
         return {"error": f"User with this id {id} does not exist"}, 404
-    return results
+    return  results
 
 @app.route("/delete_result_by_id/<id>", methods=["DELETE"])
 async def delete_result_by_id(id):

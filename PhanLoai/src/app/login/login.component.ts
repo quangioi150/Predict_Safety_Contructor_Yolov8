@@ -54,20 +54,25 @@ export class LoginComponent {
   }
 
   login(userId: string) {
-    // this.newItemEvent.emit(userId);
-    // let username = this.formLogin.controls["username"].value;
-    // let password = this.formLogin.controls["password"].value;
-    // this.userService.login(username,password).subscribe({
-    //   next: (data: any)=> {
-    //     console.log(data)
-    //     if(typeof(data.User.UserID) == "number") {
-    //       localStorage.setItem("userInfo", JSON.stringify(data));
+    this.newItemEvent.emit(userId);
+    let user = this.formLogin.controls["username"].value;
+    let password = this.formLogin.controls["password"].value;
+    console.log(user, password)
+    this.userService.login(user,password).subscribe({
+      next: (data: any)=> {
+        console.log(data)
+        if(typeof(data.User.UserID) == "number") {
+          localStorage.setItem("userInfo", JSON.stringify(data));
           this.router.navigateByUrl("classify")
-    //     }
-    //   },error: error => {
-    //     this.messageService.add({severity:'error', summary: 'Error', detail: 'Tài khoản hoặc mật khẩu không đúng'});
-    //   }
-    // })
+
+        }
+        else {
+          this.messageService.add({severity:'error', summary: 'Error', detail: 'Tài khoản hoặc mật khẩu không đúng'});
+        }
+      },error: error => {
+        this.messageService.add({severity:'error', summary: 'Error', detail: 'Tài khoản hoặc mật khẩu không đúng'});
+      }
+    })
   }
 
   register() {
