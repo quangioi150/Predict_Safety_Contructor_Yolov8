@@ -300,7 +300,7 @@ def get_parameters(conn, image, user_id):
 def get_average(results):
     averages = {}
 
-    for item in data:
+    for item in results:
         UserID = str(item["UserID"])  # Chuyển UserID sang kiểu chuỗi
         image_id = item["ImageID"]
         name_object = item["NameObject"]
