@@ -297,5 +297,35 @@ def get_parameters(conn, image, user_id):
         # print(image_id, name, confidence)
         
         
-        
-        
+def get_average(results):
+    averages = {}
+
+    for item in data:
+        UserID = item["UserID"]
+        Image = item["Images"]
+        image_id = item["ImageID"]
+        name_object = item["NameObject"]
+        do_chinh_xac = item["DoChinhXac"]
+        NgayTest =  item["NgayTest"]
+
+        if image_id not in averages:
+            averages[image_id] = {}
+        if name_object not in averages[image_id]:
+            averages[image_id][name_object] = []
+        averages[image_id][name_object].append(do_chinh_xac)
+
+    # Tính trung bình cộng và gộp kết quả
+    result = []
+
+    for image_id, name_objects in averages.items():
+        for name_object, do_chinh_xacs in name_objects.items():
+            average = sum(do_chinh_xacs) / len(do_chinh_xacs)
+            result.append({
+                "UserID": UserID,
+                "Image": Image,
+                "ImageID": image_id,
+                "NameObject": name_object,
+                "NgayTest": NgayTest,
+                "DoChinhXac": average
+            })
+    return result
