@@ -300,46 +300,9 @@ def get_parameters(conn, image, user_id):
 # def get_average(results):
 #     averages = {}
 
-#     for item in results:
-#         UserID = str(item["UserID"])  # Chuyển UserID sang kiểu chuỗi
-#         image_id = item["ImageID"]
-#         name_object = item["NameObject"]
-#         do_chinh_xac = item["DoChinhXac"]
-#         NgayTest = item["NgayTest"]
-#         Image = item["Image"]
-
-#         if image_id not in averages:
-#             averages[image_id] = {}
-#         if name_object not in averages[image_id]:
-#             averages[image_id][name_object] = {}
-#         if Image not in averages[image_id][name_object]:
-#             averages[image_id][name_object][Image] = []
-
-#         averages[image_id][name_object][Image].append(do_chinh_xac)
-
-#     # Tính trung bình cộng và gộp kết quả
-#     result = []
-
-#     for image_id, name_objects in averages.items():
-#         for name_object, images in name_objects.items():
-#             for image, do_chinh_xacs in images.items():
-#                 average = sum(do_chinh_xacs) / len(do_chinh_xacs)
-#                 result.append({
-#                     "UserID": UserID,
-#                     "Image": image,
-#                     "ImageID": image_id,
-#                     "NameObject": name_object,
-#                     "NgayTest": NgayTest,
-#                     "DoChinhXac": average
-#                 })
-#     return result
-
-from collections import defaultdict
-
-def get_average(results):
-    averages = defaultdict(lambda: defaultdict(lambda: defaultdict(list)))
-
     for item in results:
+        UserID = item["UserID"]
+        Image = item["Images"]
         image_id = item["ImageID"]
         name_object = item["NameObject"]
         do_chinh_xac = item["DoChinhXac"]

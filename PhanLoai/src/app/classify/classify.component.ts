@@ -72,24 +72,6 @@ export class ClassifyComponent {
   link = ''
 
   startCamera() {
-    // this.imageURL =''
-    // this.videoUrl = ''
-    // document.querySelector('.regular').classList.remove('none') 
-    
-    // if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-    //   navigator.mediaDevices.getUserMedia({ video: true })
-    //     .then(stream => {
-    //       this.stream = stream;
-    //       const video = this.videoElement.nativeElement;
-    //       video.srcObject = stream;
-    //       video.play();
-    //     })
-    //     .catch(error => {
-    //       console.error('Error accessing camera:', error);
-    //     });
-    // } else {
-    //   console.error('getUserMedia is not supported');
-    // }
     this.countClick++;
     this.imageURL = ''
     this.videoUrl =''
@@ -97,8 +79,6 @@ export class ClassifyComponent {
       this.camStatus = 'Dừng camera'
       this.isClicked = !this.isClicked
       this.link = 'http://127.0.0.1:5000/video_feed_camera'
-      // this.updateResult();
-      // setInterval(() => this.updateResult(), 100);
       this.intervalId = setInterval(() => this.updateResult(), 2000);
       this.intervalId2 = setInterval(() => this.getResultByUserID(), 2000);
     }
@@ -120,12 +100,8 @@ export class ClassifyComponent {
     if (this.stream) {
       const video = this.videoElement.nativeElement;
       const stream = video.srcObject as MediaStream;
-
-      // Stop the video stream
       const tracks = stream.getTracks();
       tracks.forEach(track => track.stop());
-
-      // Clear the srcObject property
       video.srcObject = null;
     }
   }
@@ -146,7 +122,6 @@ export class ClassifyComponent {
   
   public userList: Result[] = [];
   public list: User[]=[];
-  // selectedFile: File;
   videoUrl: string;
   uploadForm: FormGroup;
   imageURL: string = '';
@@ -179,28 +154,19 @@ export class ClassifyComponent {
           if (response['danger'] === '') {
             this.result = response['danger'];
             this.title = 'SAFETY';
-            // document.querySelector("#title").classList.remove('red')
-            // document.querySelector("#title").classList.add('green')
             this.messages = [
               { severity: 'success', summary: 'SAFETY', detail: 'Everything good' },
           ];
-            // this.messageService.add({severity:'success', summary:'SAFETY', detail:'Everything good'});
           } else {
             this.result = response['danger'];
             this.title = 'DANGEROUS';
             this.messages = [
               { severity: 'error', summary: 'DANGEROUS', detail: response['danger'] },
           ];
-            // document.querySelector("#title").classList.remove('green')
-            // document.querySelector("#title").classList.add('red')
-            // this.messageService.add({severity:'error', summary:'DANGEROUS', detail:response['danger']});
           }
         
       });
   }
-  
-  
-  
    
   showPreview(event) {
     const file: File = event.target.files[0];
@@ -209,7 +175,7 @@ export class ClassifyComponent {
     const reader = new FileReader();
 
     reader.onload = (e: any) => {
-      if(fileType.startsWith('image/') || // Check MIME type for image files
+      if(fileType.startsWith('image/') || 
     ['jpg', 'jpeg', 'png', 'gif'].includes(file.name.split('.').pop())) {
       this.videoUrl = ''
       this.imageURL = e.target.result
@@ -227,25 +193,9 @@ export class ClassifyComponent {
     console.log(this.imageURL)
     this.selectedFile = file
     console.log( this.selectedFile)
-    // const file = (event.target as HTMLInputElement).files[0];
-    // this.uploadForm.patchValue({
-    //   avatar: file
-    // });
-    // this.uploadForm.get('avatar').updateValueAndValidity()
-    // const reader = new FileReader();
-    // reader.onload = () => {
-    //   this.imageURL = reader.result as string;
-    // }
-    // reader.readAsDataURL(file)
   }
 
   getAllResult(){
-    // this.resultService.getAllResult().subscribe((data: any) => {
-    //   this.userList = [];
-    //   console.log(data)
-    //   this.userList = data
-    //   this.cdr.detectChanges()
-    // });
     
   }
   logout() {
@@ -331,36 +281,6 @@ export class ClassifyComponent {
 
     }
 
-    // this.cdr.detectChanges();
-    
-    // let img = this.uploadForm.controls["avatar"].value
-    // let userid = this.userInfor.UserID
-    // let linkImg = "http.com"
-    // console.log(img)
-    
-    // this.resultService.addResult(userid, linkImg, formData).subscribe({
-    //   next: (data:any )=> {
-    //     console.log(data)
-    //     this.getAllResult()
-    //     if(data.UserID != null) {
-    //       this.messageService.add({severity:'success', summary:'Success', detail: 'Phân loại thành công'})
-    //     }
-    //   },error: error => {
-    //     this.messageService.add({severity:'error', summary: 'Error', detail: 'Lỗi trong quá trình phân loại'});
-    //   }
-    // })
-
-  }
-
-  classify1() {
-    console.log( this.selectedFile)
-
-    let formData = new FormData
-    formData.append("file",this.selectedFile)
-    const url = 'http://127.0.0.1:5000/upload_video';
-    this.http.post(url,formData).subscribe(response => {
-      this.link = `http://127.0.0.1:5000/video_feed_video/${response['filename']}`
-    });
   }
   
 }
