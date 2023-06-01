@@ -20,6 +20,7 @@ from data.db import *
 from utils import detect_sample_model, add_bboxs_on_img, object_json, save_object, get_prediction, get_parameters
 
 dangerous_str = ""
+user_id = ""
 
 #Gọi model
 model = YOLO("models/best.pt")
@@ -44,10 +45,78 @@ cap.set(cv2.CAP_PROP_FPS, 30)
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, 700)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 500)
 
+## Login , Logout
+conn = connect()
+
+class User:
+    def __init__(self, HoTen, TenDN, DiaChi, NgaySinh, MatKhau):
+        self.HoTen = HoTen
+        self.TenDN = TenDN
+        self.DiaChi = DiaChi
+        self.NgaySinh = NgaySinh
+        self.MatKhau = MatKhau
+
+@app.route("/login", methods=["POST"])
+async def login_user():
+    global user_id
+    user = request.form.get("user")
+    password = request.form.get("password")
+    results = Login(conn, user, password)
+    if not results:
+        return {"error": f"User with this id {id} does not exist"}, 404
+    print("-------->{}".format(results['UserID']))
+    user_id= results['UserID']
+    return  results
+
+@app.route("/delete_result_by_id/<id>", methods=["DELETE"])
+async def delete_result_by_id(id):
+    results = delete_result_by_id(conn, id)
+    return results
+
+@app.route("/get/<id>", methods=["GET"])
+async def get_user(id):
+    user = get_user_by_id(conn, id)
+    return user
+
+@app.route("/user", methods=["POST"])
+async def insert_user():
+    HoTen = request.form.get("HoTen")
+    TenDN = request.form.get("TenDN")
+    DiaChi = request.form.get("DiaChi")
+    NgaySinh = request.form.get("NgaySinh")
+    MatKhau = request.form.get("MatKhau")
+    insert_user(conn, HoTen, TenDN, DiaChi, NgaySinh, MatKhau)
+    return {
+        "HoTen": HoTen,
+        "TenDN": TenDN,
+        "DiaChi": DiaChi,
+        "NgaySinh" : NgaySinh,
+        "MatKhau" : MatKhau,
+    }
+    
+@app.route("/update_user/<UserID>", methods=["PUT"])
+async def update_user(UserID):
+    HoTen = request.form.get("HoTen")
+    TenDN = request.form.get("TenDN")
+    DiaChi = request.form.get("DiaChi")
+    NgaySinh = request.form.get("NgaySinh")
+    MatKhau = request.form.get("MatKhau")
+    update_table_users(conn, UserID, HoTen, TenDN, DiaChi, NgaySinh, MatKhau)
+    return {
+        "UserID": UserID,
+        "HoTen": HoTen,
+        "TenDN": TenDN,
+        "DiaChi": DiaChi,
+        "NgaySinh" : NgaySinh,
+        "MatKhau" : MatKhau,
+    }
+
+
 def allowed_file(filename):
     return '.'in filename and filename.rsplit('.', 1)[1].lower() in ALLOW_EXTENSIONS
 
 def generate_frames_camera():
+    global user_id
     global dangerous_str
     while True:
         success, frame = cap.read()
@@ -60,6 +129,7 @@ def generate_frames_camera():
             thread.join()
             frame, dangerous = get_prediction(frame)
             save_object(frame)
+            get_parameters(conn, image = frame, user_id= user_id)
             dangerous_str = ' '.join(dangerous)
             ret, buffer = cv2.imencode('.jpg', frame)
             frame = buffer.tobytes()
@@ -67,21 +137,21 @@ def generate_frames_camera():
             yield (b'--frame\r\n'
                    b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
             
-def generate_frames_video(filename):
-    
-    if os.path.isdir("static/result"):
-        shutil.rmtree("static/result")
-    os.mkdir("static/result")
-    video = cv2.VideoCapture("static/uploads/" + filename)
+def generate_frames_video(video):
+    global user_id
+    global dangerous_str
     while True:
         success, frame = video.read()
         if not success:
             break
         else:
             # frame = cv2.resize(frame, (640, 480))
-
+            thread = Thread(target=get_prediction, args=(frame,))
+            thread.start()
+            thread.join()
             frame, dangerous = get_prediction(frame)
             save_object(frame)
+            get_parameters(conn, image = frame, user_id= user_id)
             dangerous_str = ' '.join(dangerous)
             ret, buffer = cv2.imencode('.jpg', frame)
             frame = buffer.tobytes()
@@ -100,6 +170,7 @@ async def home():
 
 @app.route('/', methods=["POST"])
 async def upload_image():
+    global user_id
     
     if 'file' not in request.files:
         flash('No file part')
@@ -145,7 +216,8 @@ async def upload_image():
         if "NO-Mask" in objects_detect:
             dangerous.append("NO-Mask")
 
-        get_parameters(conn, image = input_image, user_id= 1)
+        get_parameters(conn, image = input_image, user_id= user_id)
+        print("-------->{}".format(user_id))
         # add bbox on image
         final_image = add_bboxs_on_img(image = input_image, predict = predict)
         # image = cv2.cvtColor(np.array(final_image), cv2.COLOR_RGB2BGR)
@@ -155,13 +227,14 @@ async def upload_image():
 
         cv2.imwrite("static/uploads/{}_predict.jpg".format(name_image[0]), image)
         # cv2.imwrite("D:/VIETDONG/Predict_Safety_Contructor_Yolov8/PhanLoai/src/assets/{}_predict.jpg".format(name_image[0]), image)
-        cv2.imwrite("/PhanLoai/src/assets/{}_predict.jpg".format(name_image[0]), image)
+        cv2.imwrite("./PhanLoai/src/assets/{}_predict.jpg".format(name_image[0]), image)
 
         filename = "{}_predict.jpg".format(name_image[0])
         
         # return render_template('index.html', filename=filename, dangerous=dangerous)
         return { 'dangerous' : dangerous,
-                'filename': filename}
+                'filename': filename,
+                'id': session.get('user_id')}
     
     # else:
         
@@ -258,74 +331,10 @@ async def upload_video():
             
 @app.route('/video_feed_video/<filename>')
 async def video_feed_video(filename):
-    
-    # filename = session.get('filename')
-    
-    return Response(generate_frames_video(filename), mimetype='multipart/x-mixed-replace; boundary=frame')
+    video = cv2.VideoCapture("static/uploads/" + filename)
+    return Response(generate_frames_video(video), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 
-## Login , Logout
-conn = connect()
-
-class User:
-    def __init__(self, HoTen, TenDN, DiaChi, NgaySinh, MatKhau):
-        self.HoTen = HoTen
-        self.TenDN = TenDN
-        self.DiaChi = DiaChi
-        self.NgaySinh = NgaySinh
-        self.MatKhau = MatKhau
-
-@app.route("/login", methods=["POST"])
-async def login_user():
-    user = request.form.get("user")
-    password = request.form.get("password")
-    results = Login(conn, user, password)
-    if not results:
-        return {"error": f"User with this id {id} does not exist"}, 404
-    return  results
-
-@app.route("/delete_result_by_id/<id>", methods=["DELETE"])
-async def delete_result_by_id(id):
-    results = delete_result_by_id(conn, id)
-    return results
-
-@app.route("/get/<id>", methods=["GET"])
-async def get_user(id):
-    user = get_user_by_id(conn, id)
-    return user
-
-@app.route("/user", methods=["POST"])
-async def insert_user():
-    HoTen = request.form.get("HoTen")
-    TenDN = request.form.get("TenDN")
-    DiaChi = request.form.get("DiaChi")
-    NgaySinh = request.form.get("NgaySinh")
-    MatKhau = request.form.get("MatKhau")
-    insert_user(conn, HoTen, TenDN, DiaChi, NgaySinh, MatKhau)
-    return {
-        "HoTen": HoTen,
-        "TenDN": TenDN,
-        "DiaChi": DiaChi,
-        "NgaySinh" : NgaySinh,
-        "MatKhau" : MatKhau,
-    }
-    
-@app.route("/update_user/<UserID>", methods=["PUT"])
-async def update_user(UserID):
-    HoTen = request.form.get("HoTen")
-    TenDN = request.form.get("TenDN")
-    DiaChi = request.form.get("DiaChi")
-    NgaySinh = request.form.get("NgaySinh")
-    MatKhau = request.form.get("MatKhau")
-    update_table_users(conn, UserID, HoTen, TenDN, DiaChi, NgaySinh, MatKhau)
-    return {
-        "UserID": UserID,
-        "HoTen": HoTen,
-        "TenDN": TenDN,
-        "DiaChi": DiaChi,
-        "NgaySinh" : NgaySinh,
-        "MatKhau" : MatKhau,
-    }
 
 if __name__ == '__main__':
     app.run(debug = True)

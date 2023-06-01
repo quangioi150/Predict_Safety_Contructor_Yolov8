@@ -152,8 +152,16 @@ export class ClassifyComponent {
     this.uploadForm = this.fb.group({
       avatar: [null],
     })
+    this.getResultByUserID()
     
-    
+  }
+  resultsByID: any
+  getResultByUserID() {
+    this.http.get(`http://127.0.0.1:5000/get/${this.userInfor.UserID}`).subscribe(response => {
+      this.resultsByID = response
+      console.log(this.resultsByID)
+    })
+
   }
   title: any =''
   result: any
@@ -276,6 +284,7 @@ export class ClassifyComponent {
             this.messages = [
               { severity: 'success', summary: 'SAFETY', detail: 'Everything good' },
             ];
+            console.log(response['id'])
 
           }
           else {

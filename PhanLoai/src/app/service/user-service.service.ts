@@ -28,10 +28,14 @@ export class UserServiceService {
       return this.httpClient.post<any>(this.baseURL+'login', body)
   }
 
-  public register(HoTen: string, TenDN: string, DiaChi: string, NgaySinh: string, MatKhau: string) {
-    var param =  `/user?HoTen=${HoTen}&TenDN=${TenDN}&DiaChi=${DiaChi}&NgaySinh=${NgaySinh}&MatKhau=${MatKhau}`
-    var body = null
-    return this.httpClient.post<any>(this.baseURL +param, body)
+  public register( HoTen: string, TenDN: string, DiaChi: string, NgaySinh: string, MatKhau: string) {
+    const body = new FormData();
+    body.append('HoTen', HoTen);
+    body.append('TenDN', TenDN);
+    body.append('DiaChi', DiaChi);
+    body.append('NgaySinh', NgaySinh);
+    body.append('MatKhau', MatKhau);
+    return this.httpClient.post<any>(this.baseURL + 'user', body)
   }
 
   public update(UserID: number, HoTen: string, TenDN: string, DiaChi: string, NgaySinh: string, MatKhau: string) {
