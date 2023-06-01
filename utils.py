@@ -300,7 +300,7 @@ def get_parameters(conn, image, user_id):
 def get_average(results):
     averages = {}
 
-    for item in data:
+    for item in results:
         UserID = item["UserID"]
         Image = item["Images"]
         image_id = item["ImageID"]
