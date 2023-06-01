@@ -33,6 +33,7 @@ export class ClassifyComponent {
   imageUrl: string;
   dangerousObjects: string[];
   intervalId: any;
+  intervalId2: any;
   selectedFile: File | null = null;
   // imageUrl: string | null = null;
   errorMessage: string | null = null;
@@ -99,18 +100,21 @@ export class ClassifyComponent {
       // this.updateResult();
       // setInterval(() => this.updateResult(), 100);
       this.intervalId = setInterval(() => this.updateResult(), 2000);
+      this.intervalId2 = setInterval(() => this.getResultByUserID(), 2000);
     }
     else {
       this.camStatus = 'Camera'
       this.isClicked = !this.isClicked
       this.link = 'http://127.0.0.1:5000/camera_stop'
       clearInterval(this.intervalId);
+      clearInterval(this.intervalId2);
       this.title =''
     }
     
   }
   camStatus: any = 'Camera'
   countClick: any = 0
+  countClick2: any = 0
   isClicked = false
   stopCamera() {
     if (this.stream) {
@@ -160,6 +164,7 @@ export class ClassifyComponent {
     this.http.get(`http://127.0.0.1:5000/get/${this.userInfor.UserID}`).subscribe(response => {
       this.resultsByID = response
       console.log(this.resultsByID)
+      this.cdr.detectChanges();
     })
 
   }
@@ -270,46 +275,63 @@ export class ClassifyComponent {
     });
   }
   
-
+  nhanDienStatus: string = 'Nhận diện' 
   classify() {
     console.log( this.selectedFile)
     let check 
-    if (this.selectedFile) {
-      if (this.selectedFile.type.includes('image')) {
-        let formData = new FormData
-        formData.append("file",this.selectedFile)
-        const url = 'http://127.0.0.1:5000/';
-        this.http.post(url,formData).subscribe(response => {
-          if(response['dangerous'] === '') {
-            this.messages = [
-              { severity: 'success', summary: 'SAFETY', detail: 'Everything good' },
+    this.countClick2++;
+    if(this.countClick2%2!=0) {
+      this.nhanDienStatus = 'Dừng nhận diện'
+      if (this.selectedFile) {
+        if (this.selectedFile.type.includes('image')) {
+          let formData = new FormData
+          formData.append("file",this.selectedFile)
+          const url = 'http://127.0.0.1:5000/';
+          this.http.post(url,formData).subscribe(response => {
+            if(response['dangerous'] === '') {
+              this.messages = [
+                { severity: 'success', summary: 'SAFETY', detail: 'Everything good' },
+              ];
+              console.log(response['id'])
+  
+            }
+            else {
+              this.messages = [
+                { severity: 'error', summary: 'DANGEROUS', detail: response['dangerous'] },
             ];
-            console.log(response['id'])
-
-          }
-          else {
-            this.messages = [
-              { severity: 'error', summary: 'DANGEROUS', detail: response['dangerous'] },
-          ];
-          }
-          let filename = response['filename']
-          this.imageURL = `../../assets/${filename}`
-          this.title = response['dangerous']
-        });
-      } else if (this.selectedFile.type.includes('video')) {
-        let formData = new FormData
-        formData.append("file",this.selectedFile)
-        const url = 'http://127.0.0.1:5000/upload_video';
-        this.http.post(url,formData).subscribe(response => {
-          this.link = `http://127.0.0.1:5000/video_feed_video/${response['filename']}`
-          this.intervalId = setInterval(() => this.updateResult(), 2000);
-          this.videoUrl =''
-          this.imageURL = ''
-        });
-      } else {
-        console.log('Selected file is neither an image nor a video.');
+            }
+            let filename = response['filename']
+            this.imageURL = `../../assets/${filename}`
+            this.title = response['dangerous']
+            this.getResultByUserID()
+            console.log(this.resultsByID)
+          });
+          
+        } else if (this.selectedFile.type.includes('video')) {
+          let formData = new FormData
+          formData.append("file",this.selectedFile)
+          const url = 'http://127.0.0.1:5000/upload_video';
+          this.http.post(url,formData).subscribe(response => {
+            this.link = `http://127.0.0.1:5000/video_feed_video/${response['filename']}`
+            this.intervalId = setInterval(() => this.updateResult(), 2000);
+            this.videoUrl =''
+            this.imageURL = ''
+            this.intervalId2 = setInterval(() => this.getResultByUserID(), 2000);
+  
+          });
+        } else {
+          console.log('Selected file is neither an image nor a video.');
+        }
       }
     }
+    else {
+      this.nhanDienStatus = 'Nhận diện'
+      clearInterval(this.intervalId2);
+      clearInterval(this.intervalId);
+
+    }
+
+    // this.cdr.detectChanges();
     
     // let img = this.uploadForm.controls["avatar"].value
     // let userid = this.userInfor.UserID

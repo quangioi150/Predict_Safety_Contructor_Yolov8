@@ -1,4 +1,3 @@
-
 <nav class="navbar border-bottom  bg-primary   ">
     <div class="container-fluid">
         <div class="navbar-header d-flex align-items-center">
@@ -12,19 +11,13 @@
         <div class="be-right-navbar d-flex align-items-center">
             <strong class="text-white mr-3">Xin chào, {{userInfor.HoTen}}</strong>
             <div style="margin-left: 10px;">
-                <button
-                    pButton
-                    class=" w-100 p-button-danger text-center p-button-sm  p-2 font-weight-bold"
-                    label="Đăng xuất "
-                    icon="pi pi-sign-out"
-                    (click)="logout()"
-                    iconPos="right"
-                ></button>
+                <button pButton class=" w-100 p-button-danger text-center p-button-sm  p-2 font-weight-bold"
+                    label="Đăng xuất " icon="pi pi-sign-out" (click)="logout()" iconPos="right"></button>
             </div>
         </div>
     </div>
 </nav>
-<div class="container">
+<div class="container_fluid">
 
     <div class="row">
         <div class="col-lg-7">
@@ -33,10 +26,10 @@
                 </video> -->
                 <img width="90%" *ngIf="link && link !== ''" [src]="link" alt="">
                 <!-- <video  #videoElement></video> -->
-                <form class="d-flex align-items" style="flex-direction: column;" [formGroup]="uploadForm" >
+                <form class="d-flex align-items" style="flex-direction: column;" [formGroup]="uploadForm">
                     <div class="imagePreview" *ngIf="imageURL && imageURL !== ''">
-                        <img  [src]="imageURL" [alt]="uploadForm.value.name" [border]="2" height="100%" width="100%">
-                        
+                        <img [src]="imageURL" [alt]="uploadForm.value.name" [border]="2" height="100%" width="100%">
+
                     </div>
                     <div class="imagePreview" *ngIf="videoUrl && videoUrl !== ''">
                         <video *ngIf="videoUrl" controls muted height="100%" width="100%">
@@ -45,12 +38,16 @@
                         </video>
                     </div>
                     <div class="d-flex gap-3 mt-3">
-                        <input  pInputText  type="file" (change)="showPreview($event)" /> 
-                        <button (click)="startCamera()" [class.p-button-danger]="isClicked" id="start" pButton icon="pi pi-camera" type="submit" label="{{camStatus}}"></button>
+                        <input pInputText type="file" (change)="showPreview($event)" />
+                        <button (click)="startCamera()" [class.p-button-danger]="isClicked" id="start" pButton
+                            icon="pi pi-camera" type="submit" label="{{camStatus}}"></button>
                         <!-- <button (click)="stop()"  class="stop p-button-danger" pButton  icon="pi pi-camera" type="submit" label="Dừng camera"></button> -->
                     </div>
                     <div class="mt-3 w-100 d-flex justify-content-between">
-                        <button (click)="classify()" pButton class="w-100 text-center"  type="submit" label="Nhận diện"></button>
+                        <button (click)="classify()" pButton class="w-100 text-center" type="submit"
+                            label="{{nhanDienStatus}}"></button>
+                            <!-- <button (click)="classify()" pButton class="w-100 text-center" type="submit"
+                            label="Dừng nhận diện"></button> -->
                     </div>
                 </form>
                 <!-- <video *ngIf="videoUrl" controls muted  height="500px" width="500px">
@@ -60,87 +57,83 @@
                 <!-- <input  pInputText type="file" (change)="showPreview($event)" /> -->
             </div>
         </div>
-        <div class="col-lg-5" >
-            
+        <div class="col-lg-5">
+            <!-- <img src="../../assets/01-06-2023/run1/predict.jpg" alt=""> -->
 
-        <div style="margin-bottom:10px; margin-top:20px ">
-            <p-inplace [closable]="true"  >
-                <ng-template pTemplate="display">
-                    
+
+            <div style="margin-bottom:10px; margin-top:20px ">
+                <p-inplace [closable]="true">
+                    <ng-template pTemplate="display">
+
                         <button pButton icon="pi pi-user" label="Xem thông tin cá nhân"></button>
-                    
-                </ng-template>
-                <ng-template pTemplate="content">
-                    <table border="2" class="table table-bordered caption-top">
-                        <tbody>
-                            <tr class="bg-primary text-white">
-                                <th></th>
-                                <th>Thông tin</th>
-                            </tr>
-                            <tr>
-                                <th >Họ tên</th>
-                                <td>{{userInfor.HoTen}}</td>
-                            </tr>
-                            <tr>
-                                <th >Tên đăng nhập</th>
-                                <td>{{userInfor.TenDN}}</td>
-                            </tr>
-                            <tr>
-                                <th>Ngày sinh</th>
-                                <td>{{userInfor.NgaySinh}}</td>
-                            </tr>
-                            <tr>
-                                <th>Địa chỉ</th>
-                                <td>{{userInfor.DiaChi}}</td>
-                            </tr>
-                        </tbody>                
-                    </table>
-                    <div *ngFor ="let item of resultsByID">{{item['DoChinhXac']}}</div>
-                    <div class="mr-3" style="display: inline-block; margin-right: 10px">
-                        <p-table
-                    [value]="userList"
-                    [paginator]="true"
-                    [rows]="3"
-                    [rowsPerPageOptions]="[3,5]"
-                    [globalFilterFields]="['TenBenh']"
-                    styleClass="p-datatable-sm p-datatable-striped p-datatable-gridlines"
-                    responsiveLayout="scroll">
-                    <ng-template pTemplate="header">
-                      <tr>
-                        <th class="text-center">ID</th>
-                        <th class="text-center" id="STT">Ngày</th>
-                        <th class="text-center" id="Ten">Ảnh</th>
-                        <th class="text-center" id="Ten">Loại bệnh
-                            <p-columnFilter
-                                type="text"
-                                field="TenBenh"
-                                display="menu"
-                            ></p-columnFilter>        
-                        </th>
-                        <th class="text-center" id="ThaoTac">Độ chính xác</th>
-                        <th class="text-center" id="ThaoTac">Hành động</th>
-                      </tr>
-                      
+
                     </ng-template>
-                    <ng-template pTemplate="body" let-item let-rowIndex="rowIndex" >
-                      <tr>
-                        <td>
-                            {{ item.ResultID }}
-                        </td>
-                        <td class="text-center" >
-                            {{ item.NgayTest  }}
-                        </td>
-                        <td class="text-truncate" >
-                            {{ item.LinkImg }}
-                        </td>
-                        <td class="text-center"  >
-                            {{ item.TenBenh }}
-                        </td>
-                        <td class="text-center"  >
-                            {{ item.DoChinhXac * 100 | number }}%
-                        </td>
-                        
-                        <td style="width: 8rem">
+                    <ng-template pTemplate="content">
+                        <table border="2" class="table table-bordered caption-top">
+                            <tbody>
+                                <tr class="bg-primary text-white">
+                                    <th></th>
+                                    <th>Thông tin</th>
+                                </tr>
+                                <tr>
+                                    <th>Họ tên</th>
+                                    <td>{{userInfor.HoTen}}</td>
+                                </tr>
+                                <tr>
+                                    <th>Tên đăng nhập</th>
+                                    <td>{{userInfor.TenDN}}</td>
+                                </tr>
+                                <tr>
+                                    <th>Ngày sinh</th>
+                                    <td>{{userInfor.NgaySinh}}</td>
+                                </tr>
+                                <tr>
+                                    <th>Địa chỉ</th>
+                                    <td>{{userInfor.DiaChi}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div class="mr-3 mb-3 w-100" style="display: inline-block; margin-right: 10px">
+                            <p-table [value]="resultsByID" [paginator]="true" [rows]="5" [rowsPerPageOptions]="[5,7]"
+                                [globalFilterFields]="['Prediction']"
+                                styleClass="p-datatable-sm p-datatable-striped p-datatable-gridlines"
+                                responsiveLayout="scroll">
+                                <ng-template pTemplate="header">
+                                    <tr>
+                                        <th class="text-center">ID</th>
+                                        <th class="text-center" id="STT">Ngày</th>
+                                        <th class="text-center" id="Ten">Ảnh</th>
+                                        <th class="text-center" id="Ten">Trạng thái
+                                            <p-columnFilter type="text" field="Prediction"
+                                                display="menu"></p-columnFilter>
+                                        </th>
+                                        <th class="text-center" id="ThaoTac">Độ chính xác</th>
+                                        <!-- <th class="text-center" id="ThaoTac">Hành động</th> -->
+                                    </tr>
+
+                                </ng-template>
+                                <ng-template pTemplate="body" let-item let-rowIndex="rowIndex">
+                                    <tr [ngClass]="{ 'odd-row': item.ImageID % 2 !== 0 }">
+                                        <td>
+                                            {{ item.ImageID }}
+                                        </td>
+                                        <td class="text-center">
+                                            {{ item.NgayTest }}
+                                        </td>
+                                        <td class="text-truncate" style="width: 150px;">
+                                            <img [src]="'../../../.'+item.Images.substring(item.Images.indexOf('/assets/'))"
+                                                width="50%" alt="">
+
+                                        </td>
+                                        <td class="text-center">
+                                            {{ item.NameObject }}
+                                        </td>
+                                        <td class="text-center">
+                                            {{ item.DoChinhXac * 100 | number }}%
+                                        </td>
+
+                                        <!-- <td style="width: 8rem">
                           <div class="d-flex justify-content-center">
                             <button
                               pButton
@@ -151,32 +144,34 @@
                               (click)="deleteResult1(item.ResultID)"
                               class="p-button-text p-button-danger p-button-sm"></button>
                           </div>
-                        </td>
-                      </tr>
-                    </ng-template>
-                    <ng-template  pTemplate="emptymessage" let-columns>
-                        <tr>
-                          <td colspan="12" class="text-center">
-                            <img style="width: 180px;" src="/assets/nodata.PNG" alt="">
-                          </td>
-                        </tr>
-                      </ng-template>
-                    <ng-template pTemplate="summary">
-                      <div class="p-d-flex p-ai-center p-jc-between">Tổng: {{userList.length}} kết quả.</div>
-                    </ng-template>
-                  </p-table>
+                        </td> -->
+                                    </tr>
+                                </ng-template>
+                                <ng-template pTemplate="emptymessage" let-columns>
+                                    <tr>
+                                        <td colspan="12" class="text-center">
+                                            <img style="width: 180px;" src="/assets/nodata.PNG" alt="">
+                                        </td>
+                                    </tr>
+                                </ng-template>
+                                <ng-template pTemplate="summary">
+                                    <div class="p-d-flex p-ai-center p-jc-between">Tổng: {{userList.length}} kết quả.
+                                    </div>
+                                </ng-template>
+                            </p-table>
 
-                        <button (click)="userEdit(userInfor.UserID)" pButton icon="pi pi-pencil" label="Sửa thông tin cá nhân"></button>
-                    </div>
-                </ng-template>
-            </p-inplace>
-        </div>
-        <div *ngIf="title != ''">
-            <p-messages [(value)]="messages" [enableService]="false" [closable]="false"></p-messages>
-        </div>
+                            <!-- <button (click)="userEdit(userInfor.UserID)" pButton icon="pi pi-pencil"
+                                label="Sửa thông tin cá nhân"></button> -->
+                        </div>
+                    </ng-template>
+                </p-inplace>
+            </div>
+            <div *ngIf="title != ''">
+                <p-messages [(value)]="messages" [enableService]="false" [closable]="false"></p-messages>
+            </div>
 
-        
-        <!-- <p id="title">{{title}}</p>
+
+            <!-- <p id="title">{{title}}</p>
         <p id="result">{{result}}</p> -->
             <!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
@@ -199,7 +194,7 @@
                 }
                 setInterval(updateResult, 100);
             </script> -->
-           
+
             <!-- <p-table
                     [value]="userList"
                     [paginator]="true"
@@ -277,7 +272,7 @@
 <p-toast position="top-center" key="tc"></p-toast>
 <p-toast position="bottom-center" key="bc"></p-toast>
 
-<p-toast position="bottom-center" key="c"  [baseZIndex]="5000">
+<p-toast position="bottom-center" key="c" [baseZIndex]="5000">
     <ng-template let-message pTemplate="message">
         <div class="flex flex-column" style="flex: 1">
             <div class="text-center">
@@ -287,16 +282,16 @@
             </div>
             <div class="grid p-fluid">
                 <div class="col-6">
-                    <button type="button" pButton  label="Yes" class="p-button-success"></button>
+                    <button type="button" pButton label="Yes" class="p-button-success"></button>
                 </div>
                 <div class="col-6">
-                    <button type="button" pButton  label="No" class="p-button-secondary"></button>
+                    <button type="button" pButton label="No" class="p-button-secondary"></button>
                 </div>
             </div>
         </div>
     </ng-template>
 </p-toast>
- <!-- <h1>Upload Image</h1>
+<!-- <h1>Upload Image</h1>
 
  <div>
    <input type="file" (change)="onFileSelected($event)" accept="image/*" />
