@@ -297,35 +297,32 @@ def get_parameters(conn, image, user_id):
         # print(image_id, name, confidence)
         
         
+from collections import defaultdict
+
 def get_average(results):
-    averages = {}
+    averages = defaultdict(lambda: defaultdict(lambda: defaultdict(list)))
 
     for item in results:
-        UserID = item["UserID"]
-        Image = item["Images"]
         image_id = item["ImageID"]
         name_object = item["NameObject"]
         do_chinh_xac = item["DoChinhXac"]
-        NgayTest =  item["NgayTest"]
+        image = item["Images"]
 
-        if image_id not in averages:
-            averages[image_id] = {}
-        if name_object not in averages[image_id]:
-            averages[image_id][name_object] = []
-        averages[image_id][name_object].append(do_chinh_xac)
+        averages[image_id][name_object][image].append(do_chinh_xac)
 
     # Tính trung bình cộng và gộp kết quả
     result = []
-
     for image_id, name_objects in averages.items():
-        for name_object, do_chinh_xacs in name_objects.items():
-            average = sum(do_chinh_xacs) / len(do_chinh_xacs)
-            result.append({
-                "UserID": UserID,
-                "Image": Image,
-                "ImageID": image_id,
-                "NameObject": name_object,
-                "NgayTest": NgayTest,
-                "DoChinhXac": average
-            })
+        for name_object, images in name_objects.items():
+            for image, do_chinh_xacs in images.items():
+                average = sum(do_chinh_xacs) / len(do_chinh_xacs)
+                result.append({
+                    "UserID": results[0]["UserID"],
+                    "Images": image,
+                    "ImageID": image_id,
+                    "NameObject": name_object,
+                    "NgayTest": results[0]["NgayTest"],
+                    "DoChinhXac": average
+                })
+
     return result
