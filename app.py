@@ -17,7 +17,7 @@ from flask_restful import Api, Resource
 from data.db import *
 
 
-from utils import detect_sample_model, add_bboxs_on_img, object_json, save_object, get_prediction, get_parameters
+from utils import detect_sample_model, add_bboxs_on_img, object_json, save_object, get_prediction, get_parameters, get_average
 
 dangerous_str = ""
 user_id = ""
@@ -76,7 +76,8 @@ async def delete_result_by_id(id):
 @app.route("/get/<id>", methods=["GET"])
 async def get_user(id):
     user = get_user_by_id(conn, id)
-    return user
+    results = get_average(user)
+    return results
 
 @app.route("/user", methods=["POST"])
 async def insert_user():
